@@ -1,0 +1,17 @@
+12/12/2015 02:40:44.218 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:ES FOP GLOBEX 20160115 2030.0 Call
+12/12/2015 02:40:44.243 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:ES FOP GLOBEX 20160115 2030.0 Call
+12/12/2015 02:40:44.251 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:ES FOP GLOBEX 20160219 2100.0 Call
+12/12/2015 02:40:44.253 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:ES FOP GLOBEX 20160219 2100.0 Call
+12/12/2015 02:40:44.258 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:YHOO STK GLOBEX 
+12/12/2015 02:40:44.261 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:YHOO STK GLOBEX 
+12/12/2015 02:40:44.266 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:INTC STK GLOBEX 
+12/12/2015 02:40:44.269 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:INTC STK GLOBEX 
+12/12/2015 02:41:19.077 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:ES FOP GLOBEX 20160219 2100.0 Call
+12/12/2015 02:41:40.788 - [apidemo.AccountInfoPanel$MarginModel.setValueAt] - [INFO] - 1.0E7
+12/12/2015 02:44:34.937 - [apidemo.AccountInfoPanel$MarginModel.handle] - [INFO] - below the account limited:0.0
+12/12/2015 02:44:35.000 - [apidemo.AccountInfoPanel$MarginModel.handle] - [INFO] - ES FOP GLOBEX 20160115 2030.0 Call-7
+12/12/2015 02:44:35.008 - [apidemo.AccountInfoPanel$MarginModel.handle] - [INFO] - INTC STK NASDAQ 100
+12/12/2015 02:44:35.011 - [apidemo.AccountInfoPanel$MarginModel.handle] - [INFO] - YHOO STK NASDAQ -100
+12/12/2015 02:44:35.693 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:ES FOP GLOBEX 20160115 2030.0 Call
+12/12/2015 02:45:40.819 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:ES FOP GLOBEX 20160115 2030.0 Call
+12/12/2015 02:45:40.821 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:ES FOP GLOBEX 20160219 2100.0 Call

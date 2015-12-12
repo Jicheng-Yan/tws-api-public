@@ -1,0 +1,12 @@
+12/12/2015 01:56:56.125 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:ES FOP GLOBEX 20160115 2030.0 Call
+12/12/2015 01:56:56.152 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:ES FOP GLOBEX 20160115 2030.0 Call
+12/12/2015 01:56:56.160 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:ES FOP GLOBEX 20160219 2100.0 Call
+12/12/2015 01:56:56.165 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:ES FOP GLOBEX 20160219 2100.0 Call
+12/12/2015 01:56:56.171 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:YHOO STK GLOBEX 
+12/12/2015 01:56:56.174 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:YHOO STK GLOBEX 
+12/12/2015 01:56:56.182 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:INTC STK GLOBEX 
+12/12/2015 01:56:56.185 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:INTC STK GLOBEX 
+12/12/2015 01:57:13.484 - [apidemo.TopModel.setValueAt] - [INFO] - stop price set:38.0
+12/12/2015 01:58:44.933 - [apidemo.AccountInfoPanel$MarginModel.setValueAt] - [INFO] - 980000.0
+12/12/2015 02:00:23.571 - [apidemo.TopModel.setValueAt] - [INFO] - stop price set:38.0
+12/12/2015 02:00:45.578 - [apidemo.TopModel.setValueAt] - [INFO] - stop price set:37.0
