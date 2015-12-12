@@ -1,9 +1,0 @@
-12/12/2015 12:57:37.825 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:ES FOP GLOBEX 20160115 2030.0 Call
-12/12/2015 12:57:37.855 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:ES FOP GLOBEX 20160115 2030.0 Call
-12/12/2015 12:57:37.862 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:ES FOP GLOBEX 20160219 2100.0 Call
-12/12/2015 12:57:37.864 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:ES FOP GLOBEX 20160219 2100.0 Call
-12/12/2015 12:57:37.874 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:YHOO STK GLOBEX 
-12/12/2015 12:57:37.883 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:YHOO STK GLOBEX 
-12/12/2015 12:57:37.892 - [apidemo.PositionOrderAdapter.position] - [INFO] - position update:INTC STK GLOBEX 
-12/12/2015 12:57:37.895 - [apidemo.TopModel.addRow] - [INFO] - requested market data for:INTC STK GLOBEX 
-12/12/2015 12:58:53.428 - [apidemo.AccountInfoPanel$MarginModel.setValueAt] - [INFO] - net liquitadation limit: 1.0E7
