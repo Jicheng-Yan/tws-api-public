@@ -151,7 +151,8 @@ class OrderTimerActionListener implements ActionListener {
 			contract.exchange("GLOBEX");
 			contract.primaryExch("");
 
-			if ( Math.abs(contractlist.get(i).getPosition()) == (contractlist.get(i).getNumber() +  Math.abs(contractlist.get(i).getPrePosition())) ) { //short
+			if ( Math.abs(contractlist.get(i).getPosition()) == (contractlist.get(i).getNumber() +  Math.abs(contractlist.get(i).getPrePosition())) 
+					&& ((contractlist.get(i).getPrePosition() != -1)) ) { //short
 				if ( contractlist.get(i).getMin() <= 0 ||  contractlist.get(i).getAskPrice() <= 0) {
 					;
 				} else if ( contractlist.get(i).getMin() >= contractlist.get(i).getAskPrice()) { //buy
