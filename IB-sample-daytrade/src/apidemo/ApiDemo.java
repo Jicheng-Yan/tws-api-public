@@ -8,12 +8,24 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.FileHandler;
+import java.util.logging.Filter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.*;
 
 import javax.swing.Box;
 import javax.swing.JFrame;
@@ -38,6 +50,34 @@ import com.ib.controller.ApiController.ITimeHandler;
 import com.ib.controller.Formats;
 import com.ib.controller.Types.NewsType;
 
+
+
+class MyFormatter extends Formatter {
+    //
+    // Create a DateFormat to format the logger timestamp.
+    //
+    private static final DateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
+ 
+    public String format(LogRecord record) {
+        StringBuilder builder = new StringBuilder(1000);
+        builder.append(df.format(new Date(record.getMillis()))).append(" - ");
+        builder.append("[").append(record.getSourceClassName()).append(".");
+        builder.append(record.getSourceMethodName()).append("] - ");
+        builder.append("[").append(record.getLevel()).append("] - ");
+        builder.append(formatMessage(record));
+        builder.append("\n");
+        return builder.toString();
+    }
+ 
+    public String getHead(Handler h) {
+        return super.getHead(h);
+    }
+ 
+    public String getTail(Handler h) {
+        return super.getTail(h);
+    }
+}
+
 public class ApiDemo implements IConnectionHandler {
 	static {
 		NewLookAndFeel.register();
@@ -47,9 +87,9 @@ public class ApiDemo implements IConnectionHandler {
 
 	private final JTextArea m_inLog = new JTextArea();
 	private final JTextArea m_outLog = new JTextArea();
-	private final Logger m_inLogger = new Logger(m_inLog);
-	private final Logger m_outLogger = new Logger(m_outLog);
-	private final ApiController m_controller = new ApiController(this, m_inLogger, m_outLogger);
+	private final LoggerIB m_inLoggerIB = new LoggerIB( m_inLog);
+	private final LoggerIB m_outLoggerIB = new LoggerIB( m_outLog);
+	private final ApiController m_controller = new ApiController( this, m_inLoggerIB, m_outLoggerIB);
 	private final ArrayList<String> m_acctList = new ArrayList<String>();
 	private final JFrame m_frame = new JFrame();
 	private final NewTabbedPanel m_tabbedPanel = new NewTabbedPanel(true);
@@ -64,6 +104,7 @@ public class ApiDemo implements IConnectionHandler {
 	private final ComboPanel m_comboPanel = new ComboPanel();
 	private final StratPanel m_stratPanel = new StratPanel();
 	private final JTextArea m_msg = new JTextArea();
+    private final Logger m_logger = Logger.getLogger(ApiDemo.class.getName());
 
 	// getter methods
 	public ArrayList<String> accountList() {
@@ -81,16 +122,73 @@ public class ApiDemo implements IConnectionHandler {
 	public static void main(String[] args) {
 		INSTANCE.run();
 	}
+	public Logger getDemoLogger () {
+		return m_logger;
+	}
 
 	private void run() {
-		m_tabbedPanel.addTab("Connection", m_connectionPanel);
-		m_tabbedPanel.addTab("Market Data", m_mktDataPanel);
-		m_tabbedPanel.addTab("Trading", m_tradingPanel);
-		m_tabbedPanel.addTab("Account Info", m_acctInfoPanel);
-		m_tabbedPanel.addTab("Options", m_optionsPanel);
-		m_tabbedPanel.addTab("Combos", m_comboPanel);
-		m_tabbedPanel.addTab("Contract Info", m_contractInfoPanel);
-		m_tabbedPanel.addTab("Advisor", m_advisorPanel);
+	    FileHandler handler = null;
+	    try {
+	    	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
+	    	
+	        handler = new FileHandler(dateFormat.format(Calendar.getInstance().getTime()) + "Daytrade" + ".log");
+	        handler.setFormatter(new MyFormatter());  // Set the log format
+	        handler.setFilter(new Filter() {
+	            public boolean isLoggable(LogRecord record) {
+	                //
+	                // When the LogRecord level is equals to Level.SEVERE the 
+	                // message is recorded to the file.
+	                //
+	            	boolean b = false;
+	            	if (record.getLevel().equals(Level.SEVERE)) {
+	            		b = true;
+	            	} else if (record.getLevel().equals(Level.WARNING)) {
+	            		b = true;
+	            	} else if (record.getLevel().equals(Level.INFO)) {
+	            		b = true;
+	            	} else if (record.getLevel().equals(Level.FINE)) {
+	            		b = false;
+	            	} else if (record.getLevel().equals(Level.FINER)) {
+	            		b = true;
+	            	} else if (record.getLevel().equals(Level.FINEST)) {
+	            		b = true;
+	            	} else if (record.getLevel().equals(Level.CONFIG)) {
+	            		b = true;
+	            	}
+	            	
+	            	return b;
+	            }
+	        });
+	    } catch (IOException e) {
+	        m_logger.log(Level.SEVERE, "Fail to create logger handler", e);
+	    }
+	    
+	    m_logger.addHandler(handler);
+	    m_logger.setLevel(Level.FINEST);
+	 		
+	    
+	    // Redirecting System.out and System.err
+	    /*
+		try {
+			PrintStream outPS = new PrintStream(
+			   new BufferedOutputStream(
+			      new FileOutputStream("IB-stoplimited.log", true)));
+		    System.setErr(outPS);    // redirect System.err
+		    System.setOut(outPS);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			m_logger.log(Level.SEVERE, e.getMessage(), e);
+		}  // append is true
+	    */  
+	    m_tabbedPanel.addTab( "Connection", m_connectionPanel);
+		m_tabbedPanel.addTab( "Market Data", m_mktDataPanel);
+		m_tabbedPanel.addTab( "Trading", m_tradingPanel);
+		m_tabbedPanel.addTab( "Account Info", m_acctInfoPanel);
+		m_tabbedPanel.addTab( "Options", m_optionsPanel);
+		m_tabbedPanel.addTab( "Combos", m_comboPanel);
+		m_tabbedPanel.addTab( "Contract Info", m_contractInfoPanel);
+		m_tabbedPanel.addTab( "Advisor", m_advisorPanel);
 		// m_tabbedPanel.addTab( "Strategy", m_stratPanel); in progress
 
 		m_msg.setEditable(false);
@@ -200,6 +298,8 @@ public class ApiDemo implements IConnectionHandler {
 		private final Calendar cal_end = Calendar.getInstance();
 
 		public ConnectionPanel() {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+
 			m_startTime.setText("" + (cal_start.get(Calendar.YEAR))	+ "/" + 
 					(cal_start.get(Calendar.MONTH) + 1 ) + "/" + 
 					(cal_start.get(Calendar.DAY_OF_MONTH) -1 ) + "-" + "17:01:00" );
@@ -209,6 +309,17 @@ public class ApiDemo implements IConnectionHandler {
 					(cal_end.get(Calendar.MONTH ) + 1 ) + "/" + 
 					((cal_end.get(Calendar.DAY_OF_MONTH))) + "-" + "15:14:00" );
 			m_endTime.addActionListener(this);
+
+			try {
+				Date date1 = sdf.parse(m_startTime.getText());
+				cal_start.setTime(date1);
+				
+				date1 = sdf.parse(m_endTime.getText());
+				cal_end.setTime(date1);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			HtmlButton connect = new HtmlButton("Connect") {
 				@Override
@@ -255,11 +366,13 @@ public class ApiDemo implements IConnectionHandler {
 			try {
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
 				Date date1 = sdf.parse(m_startTime.getText());
-				System.out.println(sdf.format(date1));
+				//System.out.println(sdf.format(date1));
+				ApiDemo.INSTANCE.getDemoLogger().info(sdf.format(date1));
 				cal_start.setTime(date1);
 				
 				Date date2 = sdf.parse(m_endTime.getText());
-				System.out.println(sdf.format(date2));
+				//System.out.println(sdf.format(date2));
+				ApiDemo.INSTANCE.getDemoLogger().info(sdf.format(date2));
 				cal_end.setTime(date2);
 
 			} catch (ParseException ex) {
@@ -272,24 +385,32 @@ public class ApiDemo implements IConnectionHandler {
 			m_controller.connect(m_host.getText(), port, clientId);
 		}
 	}
-
-	private static class Logger implements ILogger {
+	
+	private static class LoggerIB implements ILogger {
 		final private JTextArea m_area;
-
-		Logger(JTextArea area) {
+		private String m_buffer;
+		
+		LoggerIB( JTextArea area) {
 			m_area = area;
+			m_buffer = "";
 		}
 
-		@Override
-		public void log(final String str) {
-			/*
-			 * SwingUtilities.invokeLater( new Runnable() {
-			 * 
-			 * @Override public void run() { m_area.append(str);
-			 * 
-			 * Dimension d = m_area.getSize(); m_area.scrollRectToVisible( new
-			 * Rectangle( 0, d.height, 1, 1) ); } });
-			 */
+		@Override public void log(final String str) {
+			if (str.equals("\n")) {
+				ApiDemo.INSTANCE.m_logger.fine(m_buffer);
+				m_buffer = "";
+			} else  {
+				m_buffer = m_buffer + str;
+			}
+				/*
+			SwingUtilities.invokeLater( new Runnable() {
+				@Override public void run() {
+					m_area.append(str);
+					
+					Dimension d = m_area.getSize();
+					m_area.scrollRectToVisible( new Rectangle( 0, d.height, 1, 1) );
+				}
+			});*/
 		}
 	}
 }

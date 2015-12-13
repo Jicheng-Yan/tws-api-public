@@ -98,6 +98,7 @@ class PositionOrderAdapter implements IPositionHandler, ILiveOrderHandler {
 		// TODO Auto-generated method stub
 		contract.exchange("GLOBEX");
 		contract.primaryExch("");
+		ApiDemo.INSTANCE.getDemoLogger().info("position update:" + contract.description());
 		ApiDemo.INSTANCE.m_mktDataPanel.addContract( contract, position, avgCost);
 	}
 
@@ -111,9 +112,11 @@ class OrderTimerActionListener implements ActionListener {
 	NewContract contract;
 	
 	public void actionPerformed(ActionEvent e) {
-	    //System.out.println("xyz");
 	    
-	    ArrayList<TopRow> contractlist  =   ApiDemo.INSTANCE.m_mktDataPanel.getResultPanel().m_model.getRowsList();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+		ApiDemo.INSTANCE.getDemoLogger().fine("timer running: "+ dateFormat.format(Calendar.getInstance().getTime()));
+
+		ArrayList<TopRow> contractlist  =   ApiDemo.INSTANCE.m_mktDataPanel.getResultPanel().m_model.getRowsList();
 
 	    for (int i = 0; i < contractlist.size(); i++) {
 			if ( contractlist.get(i).getPosition() == 0) {
@@ -121,28 +124,29 @@ class OrderTimerActionListener implements ActionListener {
 			}
 			
 			if ( Calendar.getInstance().before(ApiDemo.INSTANCE.getStartTime())) {
-				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-				System.out.println(dateFormat.format(ApiDemo.INSTANCE.getStartTime().getTime()));
+				ApiDemo.INSTANCE.getDemoLogger().fine("trading session not started, before: "+ dateFormat.format(ApiDemo.INSTANCE.getStartTime().getTime()));
 				continue;
 			}
 
 			if ( Calendar.getInstance().after(ApiDemo.INSTANCE.getEndTime())) {
-				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-				System.out.println(dateFormat.format(ApiDemo.INSTANCE.getEndTime().getTime()));
+				ApiDemo.INSTANCE.getDemoLogger().fine("trading session has finished, after: "+ dateFormat.format(ApiDemo.INSTANCE.getEndTime().getTime()));
 				continue;
 			}
 			
 
 			
 			if ( contractlist.get(i).getAskPrice() <= 0 || contractlist.get(i).getBidPrice() <= 0 ) {
+				ApiDemo.INSTANCE.getDemoLogger().info("bid or ask is not normal - bid: "+ contractlist.get(i).getBidPrice() + "ask: " + contractlist.get(i).getAskPrice());
 				continue;
 			}
 			
 			if ( (contractlist.get(i).getAskPrice() - contractlist.get(i).getBidPrice())/contractlist.get(i).getAskPrice() >= 0.2) {
+				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask - bid: "+ contractlist.get(i).getBidPrice() + "ask: " + contractlist.get(i).getAskPrice());
 				continue;
 			}
 
 			if ( contractlist.get(i).getStatus()== TradingStatus.Selling || contractlist.get(i).getStatus() == TradingStatus.buying) {
+				ApiDemo.INSTANCE.getDemoLogger().info("order not finished yet");
 				continue;
 			}
 
@@ -160,6 +164,7 @@ class OrderTimerActionListener implements ActionListener {
 					contractlist.get(i).setStatus(TradingStatus.buying);
 					contractlist.get(i).setPrePosition( contractlist.get(i).getPosition());
 					
+					ApiDemo.INSTANCE.getDemoLogger().info("buy "+contract.description() + " " + Math.abs(contractlist.get(i).getNumber()));
 					NewOrder order = new NewOrder();
 					order.orderType( OrderType.MKT);
 					//order.lmtPrice( 150);
@@ -191,7 +196,8 @@ class OrderTimerActionListener implements ActionListener {
 					contractlist.get(i).setCount( (contractlist.get(i).getCount()+1));
 					contractlist.get(i).setStatus(TradingStatus.Selling);
 					contractlist.get(i).setPrePosition( contractlist.get(i).getPosition());
-					
+
+					ApiDemo.INSTANCE.getDemoLogger().info("sell "+contract.description() + " " + Math.abs(contractlist.get(i).getNumber()));					
 					NewOrder order = new NewOrder();
 					order.orderType( OrderType.MKT);
 					//order.lmtPrice( 150);

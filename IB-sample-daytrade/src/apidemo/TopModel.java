@@ -37,16 +37,19 @@ class TopModel extends AbstractTableModel {
 			if (full.getStatus() == TradingStatus.buying)  {
 				if ( Math.abs(full.getPrePosition()) == Math.abs(position) + full.getNumber()) {
 					full.setStatus(TradingStatus.bought);
+					ApiDemo.INSTANCE.getDemoLogger().info("bought done");
 				}
 			} else if (full.getStatus() == TradingStatus.Selling) {
 				if ( Math.abs(position) == Math.abs(full.getPrePosition()) + full.getNumber()) {
 					full.setStatus(TradingStatus.sold);
+					ApiDemo.INSTANCE.getDemoLogger().info("sold done");
 				}
 			}
 			fireTableRowsInserted(m_rows.size() - 1, m_rows.size() - 1);
 		} else {
 			TopRow row = new TopRow(this, contract, position, avgCost);
 			m_rows.add(row);
+			ApiDemo.INSTANCE.getDemoLogger().info( "requested market data for:" + contract.description());
 			ApiDemo.INSTANCE.controller().reqTopMktData(contract, "", false, row);
 			m_map.put(contract.localSymbol(), row);
 			fireTableRowsInserted(m_rows.size() - 1, m_rows.size() - 1);
