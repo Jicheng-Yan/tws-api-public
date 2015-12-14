@@ -136,17 +136,17 @@ class OrderTimerActionListener implements ActionListener {
 
 			
 			if ( contractlist.get(i).getAskPrice() <= 0 || contractlist.get(i).getBidPrice() <= 0 ) {
-				ApiDemo.INSTANCE.getDemoLogger().info("bid or ask is not normal - bid: "+ contractlist.get(i).getBidPrice() + "ask: " + contractlist.get(i).getAskPrice());
+				ApiDemo.INSTANCE.getDemoLogger().info("bid or ask is not normal - bid: " + contractlist.get(i).getContract().description() + contractlist.get(i).getBidPrice() + " ask: " + contractlist.get(i).getAskPrice());
 				continue;
 			}
 			
 			if ( (contractlist.get(i).getAskPrice() - contractlist.get(i).getBidPrice())/contractlist.get(i).getAskPrice() >= 0.2) {
-				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask - bid: "+ contractlist.get(i).getBidPrice() + "ask: " + contractlist.get(i).getAskPrice());
+				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask - bid: " + contractlist.get(i).getContract().description() + contractlist.get(i).getBidPrice() + " ask: " + contractlist.get(i).getAskPrice());
 				continue;
 			}
 
 			if ( contractlist.get(i).getStatus()== TradingStatus.Selling || contractlist.get(i).getStatus() == TradingStatus.buying) {
-				ApiDemo.INSTANCE.getDemoLogger().info("order not finished yet");
+				ApiDemo.INSTANCE.getDemoLogger().info("" + contractlist.get(i).getContract().description() + "order not finished yet");
 				continue;
 			}
 
