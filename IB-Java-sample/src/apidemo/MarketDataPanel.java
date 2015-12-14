@@ -158,7 +158,7 @@ class OrderTimerActionListener implements ActionListener {
 			}
 
 			double midPrice = Math.round( (contractlist.get(i).getBidPrice() + contractlist.get(i).getAskPrice())/2*100)/100.0 ;
-			ApiDemo.INSTANCE.getDemoLogger().info("mid price is " + midPrice);
+			ApiDemo.INSTANCE.getDemoLogger().fine("mid price is " + midPrice);
 			
 			contract = contractlist.get(i).getContract();
 			//contract.conid(0);
