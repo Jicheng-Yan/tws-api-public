@@ -119,7 +119,7 @@ class OrderTimerActionListener implements ActionListener {
 		ArrayList<TopRow> contractlist  =   ApiDemo.INSTANCE.m_mktDataPanel.getResultPanel().m_model.getRowsList();
 
 	    for (int i = 0; i < contractlist.size(); i++) {
-			if ( contractlist.get(i).getCount() > 4) {
+			if ( contractlist.get(i).getCount() > 5) { // keep as odd number
 				//contractlist.get(i).setCount(0);
 				//contractlist.get(i).setStopPrice(contractlist.get(i).getStopPrice()*1.05);
 				//ApiDemo.INSTANCE.getDemoLogger().info("trading over the limit, adjusting stop limit to "+contractlist.get(i).getStopPrice()*1.05);
