@@ -96,8 +96,12 @@ class PositionOrderAdapter implements IPositionHandler, ILiveOrderHandler {
 	@Override
 	public void position(String account, NewContract contract, int position, double avgCost) {
 		// TODO Auto-generated method stub
-		contract.exchange("GLOBEX"); // need to specify exchange otherwise reqmkdata will not work
-		contract.primaryExch("");
+		if ( contract.secType() == SecType.FOP ) {
+			contract.exchange("GLOBEX");
+			contract.primaryExch("");
+		} else if ( contract.secType() == SecType.OPT ) {
+			contract.exchange("SMART");
+		}
 		ApiDemo.INSTANCE.getDemoLogger().info("position update:" + contract.description());
 		ApiDemo.INSTANCE.m_mktDataPanel.addContract( contract, position, avgCost);
 	}
@@ -119,7 +123,7 @@ class OrderTimerActionListener implements ActionListener {
 		ArrayList<TopRow> contractlist  =   ApiDemo.INSTANCE.m_mktDataPanel.getResultPanel().m_model.getRowsList();
 
 	    for (int i = 0; i < contractlist.size(); i++) {
-			if ( contractlist.get(i).getCount() > 5) { // keep as odd number
+			if ( contractlist.get(i).getCount() >11) { // keep as odd number
 				//contractlist.get(i).setCount(0);
 				//contractlist.get(i).setStopPrice(contractlist.get(i).getStopPrice()*1.05);
 				//ApiDemo.INSTANCE.getDemoLogger().info("trading over the limit, adjusting stop limit to "+contractlist.get(i).getStopPrice()*1.05);
