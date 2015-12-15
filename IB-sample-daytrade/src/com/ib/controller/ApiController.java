@@ -628,7 +628,7 @@ public class ApiController implements EWrapper {
 		sendEOM();
 	}
 
-	void cancelOptionComp(IOptHandler handler) {
+	public void cancelOptionComp(IOptHandler handler) {
 		Integer reqId = getAndRemoveKey(m_optionCompMap, handler);
 		if (reqId != null) {
 			m_client.cancelCalculateOptionPrice(reqId);

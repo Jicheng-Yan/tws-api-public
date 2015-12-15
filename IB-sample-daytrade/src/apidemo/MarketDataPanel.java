@@ -96,8 +96,12 @@ class PositionOrderAdapter implements IPositionHandler, ILiveOrderHandler {
 	@Override
 	public void position(String account, NewContract contract, int position, double avgCost) {
 		// TODO Auto-generated method stub
-		contract.exchange("GLOBEX");
-		contract.primaryExch("");
+		if ( contract.secType() == SecType.FOP ) {
+			contract.exchange("GLOBEX");
+			contract.primaryExch("");
+		} else if ( contract.secType() == SecType.OPT ) {
+			contract.exchange("SMART");
+		}
 		ApiDemo.INSTANCE.getDemoLogger().info("position update:" + contract.description());
 		ApiDemo.INSTANCE.m_mktDataPanel.addContract( contract, position, avgCost);
 	}
@@ -229,7 +233,7 @@ class OrderTimerActionListener implements ActionListener {
 
 class MyTimerActionListener implements ActionListener {
 	  public void actionPerformed(ActionEvent e) {
-	    System.out.println("abc");
+	    //System.out.println("abc");
 	    //ApiDemo.INSTANCE.controller().reqPositions(ApiDemo.INSTANCE.m_mktDataPanel.getCallback());
 	    //ApiDemo.INSTANCE.controller().reqLiveOrders(ApiDemo.INSTANCE.m_mktDataPanel.position_order_callback);
 	  }

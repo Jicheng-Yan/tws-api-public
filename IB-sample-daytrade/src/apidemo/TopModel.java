@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import com.ib.controller.ApiController.IOptHandler;
 import com.ib.controller.ApiController.IOrderHandler;
 import com.ib.controller.ApiController.TopMktDataAdapter;
 import com.ib.controller.Formats;
@@ -50,7 +51,8 @@ class TopModel extends AbstractTableModel {
 			TopRow row = new TopRow(this, contract, position, avgCost);
 			m_rows.add(row);
 			ApiDemo.INSTANCE.getDemoLogger().info( "requested market data for:" + contract.description());
-			ApiDemo.INSTANCE.controller().reqTopMktData(contract, "", false, row);
+			//ApiDemo.INSTANCE.controller().reqTopMktData(contract, "", false, row);
+			ApiDemo.INSTANCE.controller().reqOptionMktData(contract, "", false, row);
 			m_map.put(contract.localSymbol(), row);
 			fireTableRowsInserted(m_rows.size() - 1, m_rows.size() - 1);
 		}
@@ -82,7 +84,7 @@ class TopModel extends AbstractTableModel {
 
 	@Override
 	public int getColumnCount() {
-		return 18;
+		return 28;
 	}
 
 	@Override
@@ -91,13 +93,13 @@ class TopModel extends AbstractTableModel {
 		case 0:
 			return "Description";
 		case 1:
-			return "Bid Size";
+			return "BidSize";
 		case 2:
 			return "Bid";
 		case 3:
 			return "Ask";
 		case 4:
-			return "Ask Size";
+			return "AskSize";
 		case 5:
 			return "Last";
 		case 6:
@@ -107,23 +109,43 @@ class TopModel extends AbstractTableModel {
 		case 8:
 			return "Volume";
 		case 9:
-			return "stop price"; // jicheng
+			return "StopPrice"; // jicheng
 		case 10:
 			return "Position";
 		case 11:
 			return "AvgCost"; // jicheng
 		case 12:
-			return "PreviousPosition"; // jicheng
+			return "PrePosition"; // jicheng
 		case 13:
-			return "TradingCount";
+			return "T-Count";
 		case 14:
-			return "TradingStatus";
+			return "T-Status";
 		case 15:
 			return "Number";
 		case 16:
 			return "Max";
 		case 17:
 			return "Min";
+		case 18:
+			return "impVol";
+		case 19:
+			return "delta";
+		case 20:
+			return "gamma";
+		case 21:
+			return "vega";
+		case 22:
+			return "theta";
+		case 23:
+			return "undPrice";
+		case 24:
+			return "optPrice";
+		case 25:
+			return "impVol-S";
+		case 26:
+			return "undPrice-S";
+		case 27:
+			return "optPrice-S";
 		default:
 			return null;
 		}
@@ -169,6 +191,27 @@ class TopModel extends AbstractTableModel {
 			return fmt(row.m_max); // jicheng
 		case 17:
 			return fmt(row.m_min); // jicheng
+		case 18:
+			return fmt(row.m_impVol); // jicheng
+		case 19:
+			return fmt(row.m_delta); // jicheng
+		case 20:
+			return fmt(row.m_gamma); // jicheng
+		case 21:
+			return fmt(row.m_vega); // jicheng
+		case 22:
+			return fmt(row.m_theta); // jicheng
+		case 23:
+			return fmt(row.m_undPrice); // jicheng
+		case 24:
+			return fmt(row.m_optPrice); // jicheng
+		case 25:
+			return fmt(row.m_impVol_s); // jicheng
+		case 26:
+			return fmt(row.m_undPrice_s); // jicheng
+		case 27:
+			return fmt(row.m_optPrice_s); // jicheng
+		
 		default:
 			return null;
 		}
@@ -176,7 +219,7 @@ class TopModel extends AbstractTableModel {
 
 	@Override
 	public boolean isCellEditable(int rowSet, int col) {
-		if (col == 9 || col == 15 || col == 16  || col == 17) {
+		if (col == 9 || col == 15 || col == 16  || col == 17 || col == 25 || col == 26) {
 			return true;
 		} else {
 			return false;
@@ -204,6 +247,22 @@ class TopModel extends AbstractTableModel {
 			row.m_min = new Double(value.toString());
 			fireTableDataChanged();
 			break;
+		case 25:
+			row.m_impVol_s = new Double(value.toString());
+			if ( row.m_impVol_s > 0 ) {
+				ApiDemo.INSTANCE.controller().cancelOptionComp(row);
+				ApiDemo.INSTANCE.controller().reqOptionComputation(row.getContract(), row.m_impVol_s, row.m_undPrice_s, row);			
+			}
+			fireTableDataChanged();
+			break;
+		case 26:
+			row.m_undPrice_s = new Double(value.toString());
+			if ( row.m_undPrice_s > 0) { 
+				ApiDemo.INSTANCE.controller().cancelOptionComp(row);
+				ApiDemo.INSTANCE.controller().reqOptionComputation(row.getContract(), row.m_impVol_s, row.m_undPrice_s, row);
+			}
+			fireTableDataChanged();
+			break;
 		}
 		
 	}
@@ -218,7 +277,7 @@ class TopModel extends AbstractTableModel {
 		ApiDemo.INSTANCE.controller().cancelTopMktData(m_rows.get(i));
 	}
 
-	static class TopRow extends TopMktDataAdapter {
+	static class TopRow extends TopMktDataAdapter implements IOptHandler {
 		AbstractTableModel m_model;
 		String m_description;
 		double m_bid;
@@ -241,6 +300,17 @@ class TopModel extends AbstractTableModel {
 		double m_avgCost;
 		int m_tradingCount;
 		TradingStatus m_status;
+		double m_impVol;
+		double m_delta;
+		double m_gamma;
+		double m_vega;
+		double m_theta;
+		double m_undPrice;
+		double m_optPrice;
+		double m_impVol_s;
+		double m_undPrice_s;
+		double m_optPrice_s;
+
 
 		TopRow(AbstractTableModel model, NewContract contract, int position, double avgCost) {
 			m_model = model;
@@ -255,6 +325,11 @@ class TopModel extends AbstractTableModel {
 			m_tradingCount = 0;
 			m_status = TradingStatus.None;
 			m_prePosition = -1;
+			m_impVol = -1;
+			m_impVol_s = -1;
+			m_undPrice_s = -1;
+			m_optPrice_s = -1;
+			
 		}
 
 		public synchronized int getPrePosition() {
@@ -344,6 +419,23 @@ class TopModel extends AbstractTableModel {
 			m_model.fireTableDataChanged(); // should use a timer to be more
 											// efficient
 
+		}
+
+		@Override 
+		public void tickOptionComputation( NewTickType tickType, double impVol, double delta, double optPrice, double pvDividend, double gamma, double vega, double theta, double undPrice) {
+			if (tickType == NewTickType.MODEL_OPTION) {
+				m_impVol = impVol;
+				m_delta = delta;
+				m_gamma = gamma;
+				m_vega = vega;
+				m_theta = theta;
+				m_optPrice = optPrice;
+				m_undPrice = undPrice;
+			} else if ( tickType == NewTickType.CUST_OPTION_COMPUTATION) {
+				m_optPrice_s = optPrice;
+			}
+			m_model.fireTableDataChanged(); // should use a timer to be more
+			// efficient
 		}
 
 		@Override
