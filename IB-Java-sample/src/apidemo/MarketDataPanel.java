@@ -123,20 +123,20 @@ class OrderTimerActionListener implements ActionListener {
 		ArrayList<TopRow> contractlist  =   ApiDemo.INSTANCE.m_mktDataPanel.getResultPanel().m_model.getRowsList();
 
 	    for (int i = 0; i < contractlist.size(); i++) {
-			if ( contractlist.get(i).getCount() >11) { // keep as odd number
+			if ( contractlist.get(i).getCount() > contractlist.get(i).getTradinglimit()) { // keep as odd number
 				//contractlist.get(i).setCount(0);
 				//contractlist.get(i).setStopPrice(contractlist.get(i).getStopPrice()*1.05);
-				//ApiDemo.INSTANCE.getDemoLogger().info("trading over the limit, adjusting stop limit to "+contractlist.get(i).getStopPrice()*1.05);
+				ApiDemo.INSTANCE.getDemoLogger().info("trading over the limit ");
 				continue;
 			}
 			
-			if ( Calendar.getInstance().before(ApiDemo.INSTANCE.getStartTime())) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("trading session not started, before: "+ dateFormat.format(ApiDemo.INSTANCE.getStartTime().getTime()));
+			if ( Calendar.getInstance().before(contractlist.get(i).getStart())) {
+				ApiDemo.INSTANCE.getDemoLogger().fine("trading session not started, before: "+ dateFormat.format(contractlist.get(i).getStart().getTime()));
 				continue;
 			}
 
-			if ( Calendar.getInstance().after(ApiDemo.INSTANCE.getEndTime())) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("trading session has finished, after: "+ dateFormat.format(ApiDemo.INSTANCE.getEndTime().getTime()));
+			if ( Calendar.getInstance().after(contractlist.get(i).getEnd())) {
+				ApiDemo.INSTANCE.getDemoLogger().fine("trading session has finished, after: "+ dateFormat.format(contractlist.get(i).getEnd().getTime()));
 				continue;
 			}
 			
@@ -147,17 +147,17 @@ class OrderTimerActionListener implements ActionListener {
 			}
 			
 			if ( contractlist.get(i).getAskPrice() <= 0 || contractlist.get(i).getBidPrice() <= 0 ) {
-				ApiDemo.INSTANCE.getDemoLogger().info("bid or ask is not normal - bid: "+ contractlist.get(i).getBidPrice() + "ask: " + contractlist.get(i).getAskPrice());
+				ApiDemo.INSTANCE.getDemoLogger().info("bid or ask is not normal - bid: " + contractlist.get(i).getContract().description() + contractlist.get(i).getBidPrice() + " ask: " + contractlist.get(i).getAskPrice());
 				continue;
 			}
 			
 			if ( (contractlist.get(i).getAskPrice() - contractlist.get(i).getBidPrice())/contractlist.get(i).getAskPrice() >= 0.2) {
-				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask - bid: "+ contractlist.get(i).getBidPrice() + "ask: " + contractlist.get(i).getAskPrice());
+				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask - bid: " + contractlist.get(i).getContract().description() + contractlist.get(i).getBidPrice() + " ask: " + contractlist.get(i).getAskPrice());
 				continue;
 			}
 
 			if ( contractlist.get(i).getStatus()== TradingStatus.Selling || contractlist.get(i).getStatus() == TradingStatus.buying) {
-				ApiDemo.INSTANCE.getDemoLogger().info("order not finished yet");
+				ApiDemo.INSTANCE.getDemoLogger().info("" + contractlist.get(i).getContract().description() + "order not finished yet");
 				continue;
 			}
 
@@ -323,7 +323,7 @@ class OrderTimerActionListener implements ActionListener {
 
 class MyTimerActionListener implements ActionListener {
 	  public void actionPerformed(ActionEvent e) {
-	    System.out.println("abc");
+	    //System.out.println("abc");
 	    //ApiDemo.INSTANCE.controller().reqPositions(ApiDemo.INSTANCE.m_mktDataPanel.getCallback());
 	    //ApiDemo.INSTANCE.controller().reqLiveOrders(ApiDemo.INSTANCE.m_mktDataPanel.position_order_callback);
 	  }

@@ -8,7 +8,10 @@ import static com.ib.controller.Formats.fmtPct;
 import static com.ib.controller.Formats.*;
 
 import java.awt.Color;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import javax.swing.JLabel;
@@ -87,26 +90,29 @@ class TopModel extends AbstractTableModel {
 	}
 	
 	@Override public int getColumnCount() {
-		return 15;
+		return 18;
 	}
 	
 	@Override public String getColumnName(int col) {
 		switch( col) {
 			case 0: return "Description";
-			case 1: return "Bid Size";
+			case 1: return "BidSize";
 			case 2: return "Bid";
 			case 3: return "Ask";
-			case 4: return "Ask Size";
+			case 4: return "AskSize";
 			case 5: return "Last";
 			case 6: return "Time";
 			case 7: return "Change";
 			case 8: return "Volume";
-			case 9: return "stop price";  //jicheng
+			case 9: return "stopPrice";  //jicheng
 			case 10: return "Position";
 			case 11: return "AvgCost";  //jicheng
-			case 12: return "PreviousPosition";  //jicheng
+			case 12: return "PrePosition";  //jicheng
 			case 13: return "TradingCount";
 			case 14: return "TradingStatus";
+			case 15: return "TradingLimit";
+			case 16: return "start";
+			case 17: return "end";
 			default: return null;
 		}
 	}
@@ -129,12 +135,17 @@ class TopModel extends AbstractTableModel {
 			case 12: return row.m_prePosition;
 			case 13: return row.m_tradingCount;  // jicheng
 			case 14: return row.m_status.toString();  // jicheng
+			case 15: return row.m_tradinglimit;  // jicheng
+			case 16: 
+				return (new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss")).format(row.m_cal_start.getTime());				
+			case 17: 
+				return (new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss")).format(row.m_cal_end.getTime());
 			default: return null;
 		}
 	}
 
 	@Override public boolean isCellEditable( int rowSet, int col) {
-		if (col == 9 ) {
+		if (col == 9 || col == 15 || col == 16 || col == 17) {
 			return true;
 		} else {
 			return false;
@@ -143,8 +154,32 @@ class TopModel extends AbstractTableModel {
 	
 	@Override public void setValueAt(Object value, int rowSet, int col) {
 		TopRow row = m_rows.get( rowSet);
-		row.m_stop_price = new Double(value.toString());
-		ApiDemo.INSTANCE.getDemoLogger().info("stop price set:" + row.m_stop_price);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+		
+		if ( col == 9 ) {
+			row.m_stop_price = new Double(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("stop price set: " + row.m_stop_price);
+		} else if ( col == 15 ) {
+			row.m_tradinglimit = new Integer(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("trading limit: " + row.m_tradinglimit);
+		} else if ( col == 16 ) {
+			try {
+				row.m_cal_start.setTime(sdf.parse(value.toString()));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			ApiDemo.INSTANCE.getDemoLogger().info("start: " + value.toString());
+		} else if ( col == 17 ) {
+			try {
+				row.m_cal_end.setTime(sdf.parse(value.toString()));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			ApiDemo.INSTANCE.getDemoLogger().info("end: " + value.toString());
+		}
+
 		fireTableDataChanged();
 	}
 	
@@ -178,6 +213,10 @@ class TopModel extends AbstractTableModel {
 		double m_avgCost;
 		int m_tradingCount;
 		TradingStatus m_status;
+		int m_tradinglimit;
+		Calendar m_cal_start = Calendar.getInstance(); 
+		Calendar m_cal_end = Calendar.getInstance();
+
 		
 		TopRow( AbstractTableModel model, NewContract contract, int position, double avgCost) {
 			m_model = model;
@@ -189,6 +228,32 @@ class TopModel extends AbstractTableModel {
 			m_tradingCount = 0;
 			m_status = TradingStatus.None;
 			m_prePosition = 0;
+			m_tradinglimit = 5;
+			
+			m_cal_start.set(Calendar.DAY_OF_MONTH, m_cal_start.get(Calendar.DAY_OF_MONTH)-1);
+			m_cal_start.set(Calendar.HOUR_OF_DAY, 17);
+			m_cal_start.set(Calendar.MINUTE, 01);
+			m_cal_start.set(Calendar.SECOND , 00);
+				
+			m_cal_end.set(Calendar.HOUR_OF_DAY, 15);
+			m_cal_end.set(Calendar.MINUTE, 14);
+			m_cal_end.set(Calendar.SECOND , 00);
+		}
+
+		public  synchronized Calendar getStart() {
+			return m_cal_start;
+		}
+
+		public  synchronized Calendar getEnd() {
+			return m_cal_end;
+		}
+
+		public  synchronized int getTradinglimit() {
+			return m_tradinglimit;
+		}
+
+		public  synchronized void setTradinglimit( int number) {
+			 m_tradinglimit = number;
 		}
 
 		public  synchronized int getPrePosition() {

@@ -127,13 +127,13 @@ class OrderTimerActionListener implements ActionListener {
 				continue;
 			}
 			
-			if ( Calendar.getInstance().before(ApiDemo.INSTANCE.getStartTime())) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("trading session not started, before: "+ dateFormat.format(ApiDemo.INSTANCE.getStartTime().getTime()));
+			if ( Calendar.getInstance().before(contractlist.get(i).getStart())) {
+				ApiDemo.INSTANCE.getDemoLogger().fine("trading session not started, before: "+ dateFormat.format(contractlist.get(i).getStart().getTime()));
 				continue;
 			}
 
-			if ( Calendar.getInstance().after(ApiDemo.INSTANCE.getEndTime())) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("trading session has finished, after: "+ dateFormat.format(ApiDemo.INSTANCE.getEndTime().getTime()));
+			if ( Calendar.getInstance().after(contractlist.get(i).getEnd())) {
+				ApiDemo.INSTANCE.getDemoLogger().fine("trading session has finished, after: "+ dateFormat.format(contractlist.get(i).getEnd().getTime()));
 				continue;
 			}
 			

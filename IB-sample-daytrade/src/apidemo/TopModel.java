@@ -8,7 +8,10 @@ import static com.ib.controller.Formats.fmtPct;
 import static com.ib.controller.Formats.*;
 
 import java.awt.Color;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import javax.swing.JLabel;
@@ -84,7 +87,7 @@ class TopModel extends AbstractTableModel {
 
 	@Override
 	public int getColumnCount() {
-		return 28;
+		return 30;
 	}
 
 	@Override
@@ -146,6 +149,10 @@ class TopModel extends AbstractTableModel {
 			return "undPrice-S";
 		case 27:
 			return "optPrice-S";
+		case 28: 
+			return "Start";
+		case 29: 
+			return "End";			
 		default:
 			return null;
 		}
@@ -211,6 +218,10 @@ class TopModel extends AbstractTableModel {
 			return fmt(row.m_undPrice_s); // jicheng
 		case 27:
 			return fmt(row.m_optPrice_s); // jicheng
+		case 28: 
+			return (new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss")).format(row.m_cal_start.getTime());				
+		case 29: 
+			return (new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss")).format(row.m_cal_end.getTime());
 		
 		default:
 			return null;
@@ -219,7 +230,8 @@ class TopModel extends AbstractTableModel {
 
 	@Override
 	public boolean isCellEditable(int rowSet, int col) {
-		if (col == 9 || col == 15 || col == 16  || col == 17 || col == 25 || col == 26) {
+		if (col == 9 || col == 15 || col == 16  || col == 17 
+		 || col == 25 || col == 26 || col == 28 || col == 29) {
 			return true;
 		} else {
 			return false;
@@ -229,6 +241,7 @@ class TopModel extends AbstractTableModel {
 	@Override
 	public void setValueAt(Object value, int rowSet, int col) {
 		TopRow row = m_rows.get(rowSet);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
 
 		switch (col) {
 		case 9:
@@ -263,8 +276,27 @@ class TopModel extends AbstractTableModel {
 			}
 			fireTableDataChanged();
 			break;
+		case 28:
+			try {
+				row.m_cal_start.setTime(sdf.parse(value.toString()));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			ApiDemo.INSTANCE.getDemoLogger().info("start: " + value.toString());
+			break;
+		case 29:
+			try {
+				row.m_cal_end.setTime(sdf.parse(value.toString()));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			ApiDemo.INSTANCE.getDemoLogger().info("end: " + value.toString());	
+			break;
 		}
 		
+		fireTableDataChanged();
 	}
 
 	public void color(TableCellRenderer rend, int rowIn, Color def) {
@@ -310,6 +342,8 @@ class TopModel extends AbstractTableModel {
 		double m_impVol_s;
 		double m_undPrice_s;
 		double m_optPrice_s;
+		Calendar m_cal_start = Calendar.getInstance(); 
+		Calendar m_cal_end = Calendar.getInstance();
 
 
 		TopRow(AbstractTableModel model, NewContract contract, int position, double avgCost) {
@@ -330,9 +364,26 @@ class TopModel extends AbstractTableModel {
 			m_undPrice_s = -1;
 			m_optPrice_s = -1;
 			
+			m_cal_start.set(Calendar.DAY_OF_MONTH, m_cal_start.get(Calendar.DAY_OF_MONTH)-1);
+			m_cal_start.set(Calendar.HOUR_OF_DAY, 17);
+			m_cal_start.set(Calendar.MINUTE, 01);
+			m_cal_start.set(Calendar.SECOND , 00);
+				
+			m_cal_end.set(Calendar.HOUR_OF_DAY, 15);
+			m_cal_end.set(Calendar.MINUTE, 14);
+			m_cal_end.set(Calendar.SECOND , 00);
 		}
 
-		public synchronized int getPrePosition() {
+		public  synchronized Calendar getStart() {
+			return m_cal_start;
+		}
+
+		public  synchronized Calendar getEnd() {
+			return m_cal_end;
+		}
+
+
+		public  synchronized int getPrePosition() {
 			return m_prePosition;
 		}
 

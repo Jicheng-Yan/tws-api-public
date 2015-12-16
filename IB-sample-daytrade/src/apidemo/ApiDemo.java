@@ -94,8 +94,7 @@ public class ApiDemo implements IConnectionHandler {
 	private final JFrame m_frame = new JFrame();
 	private final NewTabbedPanel m_tabbedPanel = new NewTabbedPanel(true);
 	private final ConnectionPanel m_connectionPanel = new ConnectionPanel();
-	// jicheng private->public
-	public static final MarketDataPanel m_mktDataPanel = new MarketDataPanel();
+	public  final MarketDataPanel m_mktDataPanel = new MarketDataPanel();
 	private final ContractInfoPanel m_contractInfoPanel = new ContractInfoPanel();
 	private final TradingPanel m_tradingPanel = new TradingPanel();
 	private final AccountInfoPanel m_acctInfoPanel = new AccountInfoPanel();
@@ -217,13 +216,6 @@ public class ApiDemo implements IConnectionHandler {
 		m_controller.connect("127.0.0.1", 7496, 10);
 	}
 	
-	public Calendar getStartTime () {
-		return m_connectionPanel.cal_start;
-	}
-	
-	public Calendar getEndTime () {
-		return m_connectionPanel.cal_end;
-	}
 
 	@Override
 	public void connected() {
@@ -286,41 +278,14 @@ public class ApiDemo implements IConnectionHandler {
 	public void message(int id, int errorCode, String errorMsg) {
 		show(id + " " + errorCode + " " + errorMsg);
 	}
-
-	private class ConnectionPanel extends JPanel implements ActionListener {
+	
+	private class ConnectionPanel extends JPanel {
 		private final JTextField m_host = new JTextField(7);
 		private final JTextField m_port = new JTextField("7496", 7);
 		private final JTextField m_clientId = new JTextField("10", 7);
 		private final JLabel m_status = new JLabel("Disconnected");
-		private final JTextField m_startTime = new JTextField( "", 20); //jicheng
-		private final JTextField m_endTime = new JTextField( "", 20); //jicheng
-		private final Calendar cal_start = Calendar.getInstance();
-		private final Calendar cal_end = Calendar.getInstance();
 
 		public ConnectionPanel() {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
-
-			m_startTime.setText("" + (cal_start.get(Calendar.YEAR))	+ "/" + 
-					(cal_start.get(Calendar.MONTH) + 1 ) + "/" + 
-					(cal_start.get(Calendar.DAY_OF_MONTH) -1 ) + "-" + "17:01:00" );
-			m_startTime.addActionListener(this);
-			
-			m_endTime.setText("" + (cal_end.get(Calendar.YEAR))	+ "/" + 
-					(cal_end.get(Calendar.MONTH ) + 1 ) + "/" + 
-					((cal_end.get(Calendar.DAY_OF_MONTH))) + "-" + "15:14:00" );
-			m_endTime.addActionListener(this);
-
-			try {
-				Date date1 = sdf.parse(m_startTime.getText());
-				cal_start.setTime(date1);
-				
-				date1 = sdf.parse(m_endTime.getText());
-				cal_end.setTime(date1);
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
 			HtmlButton connect = new HtmlButton("Connect") {
 				@Override
 				public void actionPerformed() {
@@ -339,8 +304,6 @@ public class ApiDemo implements IConnectionHandler {
 			p1.add( "Host", m_host);
 			p1.add( "Port", m_port);
 			p1.add( "Client ID", m_clientId);
-			p1.add( "Start", m_startTime);
-			p1.add( "End", m_endTime);
 			
 			JPanel p2 = new VerticalPanel();
 			p2.add(connect);
@@ -360,25 +323,6 @@ public class ApiDemo implements IConnectionHandler {
 			add(p4, BorderLayout.NORTH);
 		}
 
-
-
-		public void actionPerformed( ActionEvent evt) {
-			try {
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
-				Date date1 = sdf.parse(m_startTime.getText());
-				//System.out.println(sdf.format(date1));
-				ApiDemo.INSTANCE.getDemoLogger().info(sdf.format(date1));
-				cal_start.setTime(date1);
-				
-				Date date2 = sdf.parse(m_endTime.getText());
-				//System.out.println(sdf.format(date2));
-				ApiDemo.INSTANCE.getDemoLogger().info(sdf.format(date2));
-				cal_end.setTime(date2);
-
-			} catch (ParseException ex) {
-				ex.printStackTrace();
-			}
-		}
 		protected void onConnect() {
 			int port = Integer.parseInt(m_port.getText());
 			int clientId = Integer.parseInt(m_clientId.getText());
