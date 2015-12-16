@@ -244,27 +244,27 @@ class TopModel extends AbstractTableModel {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
 
 		switch (col) {
-		case 9:
-			row.m_stop_price = new Double(value.toString());
-			fireTableDataChanged();
-			break;
 		case 15:
 			row.m_number = new Double(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("trading unit: " + value.toString());
 			fireTableDataChanged();
 			break;
 		case 16:
 			row.m_max = new Double(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("Max value: " + value.toString());
 			fireTableDataChanged();
 			break;
 		case 17:
 			row.m_min = new Double(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("Min value: " + value.toString());
 			fireTableDataChanged();
 			break;
 		case 25:
 			row.m_impVol_s = new Double(value.toString());
 			if ( row.m_impVol_s > 0 ) {
 				ApiDemo.INSTANCE.controller().cancelOptionComp(row);
-				ApiDemo.INSTANCE.controller().reqOptionComputation(row.getContract(), row.m_impVol_s, row.m_undPrice_s, row);			
+				ApiDemo.INSTANCE.controller().reqOptionComputation(row.getContract(), row.m_impVol_s, row.m_undPrice_s, row);
+				ApiDemo.INSTANCE.getDemoLogger().info("Set impVol: " + value.toString());
 			}
 			fireTableDataChanged();
 			break;
@@ -273,6 +273,7 @@ class TopModel extends AbstractTableModel {
 			if ( row.m_undPrice_s > 0) { 
 				ApiDemo.INSTANCE.controller().cancelOptionComp(row);
 				ApiDemo.INSTANCE.controller().reqOptionComputation(row.getContract(), row.m_impVol_s, row.m_undPrice_s, row);
+				ApiDemo.INSTANCE.getDemoLogger().info("Set undPrice: " + value.toString());
 			}
 			fireTableDataChanged();
 			break;
