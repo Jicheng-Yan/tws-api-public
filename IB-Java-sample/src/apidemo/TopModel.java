@@ -169,7 +169,7 @@ class TopModel extends AbstractTableModel {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			ApiDemo.INSTANCE.getDemoLogger().info("start: " + value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("" + row.getContract().description() + "start: " + value.toString());
 		} else if ( col == 17 ) {
 			try {
 				row.m_cal_end.setTime(sdf.parse(value.toString()));
@@ -177,7 +177,7 @@ class TopModel extends AbstractTableModel {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			ApiDemo.INSTANCE.getDemoLogger().info("end: " + value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("" + row.getContract().description() + "end: " + value.toString());
 		}
 
 		fireTableDataChanged();
