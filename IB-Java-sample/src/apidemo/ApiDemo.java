@@ -82,7 +82,7 @@ public class ApiDemo implements IConnectionHandler {
 	public static ApiDemo INSTANCE = new ApiDemo();
 	
 
-
+	private final LogRecord m_lastLog = new LogRecord(Level.SEVERE , "start logging");
 	private final JTextArea m_inLog = new JTextArea();
 	private final JTextArea m_outLog = new JTextArea();
 	private final LoggerIB m_inLoggerIB = new LoggerIB( m_inLog);
@@ -134,6 +134,15 @@ public class ApiDemo implements IConnectionHandler {
 	                // message is recorded to the file.
 	                //
 	            	boolean b = false;
+	            	
+	            	if ( ApiDemo.INSTANCE.m_lastLog.getMessage().equals(record.getMessage())) {
+	            		b = false;
+	            		return b;
+	            	} else {
+	            		ApiDemo.INSTANCE.m_lastLog.setMessage(record.getMessage());
+	            	}
+	            		
+
 	            	if (record.getLevel().equals(Level.SEVERE)) {
 	            		b = true;
 	            	} else if (record.getLevel().equals(Level.WARNING)) {
