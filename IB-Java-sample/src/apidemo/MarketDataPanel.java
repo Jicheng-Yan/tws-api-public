@@ -123,7 +123,7 @@ class OrderTimerActionListener implements ActionListener {
 		ArrayList<TopRow> contractlist  =   ApiDemo.INSTANCE.m_mktDataPanel.getResultPanel().m_model.getRowsList();
 
 	    for (int i = 0; i < contractlist.size(); i++) {
-			if ( contractlist.get(i).getCount() > contractlist.get(i).getTradinglimit()) { // keep as odd number
+			if ( contractlist.get(i).getCount() >= contractlist.get(i).getTradinglimit()) { // keep as odd number
 				//contractlist.get(i).setCount(0);
 				//contractlist.get(i).setStopPrice(contractlist.get(i).getStopPrice()*1.05);
 				ApiDemo.INSTANCE.getDemoLogger().info("trading over the limit ");
@@ -198,7 +198,7 @@ class OrderTimerActionListener implements ActionListener {
 					});
 
 				} 
-
+            /* only sell,  do not maintain long position
 			} else if ( contractlist.get(i).getPosition() > 0) { // long
 				if (contractlist.get(i).getStopPrice() > midPrice) { //sell
 					contractlist.get(i).setCount( (contractlist.get(i).getCount()+1));
@@ -228,8 +228,8 @@ class OrderTimerActionListener implements ActionListener {
 					});
 
 				}
-				
-			} else { // 0 position, waiting for restore position
+			*/	
+			} else if ( contractlist.get(i).getPosition() == 0) { // 0 position, waiting for restore position
 				if ( contractlist.get(i).getStatus() == TradingStatus.sold) { // need buy back
 					if (contractlist.get(i).getStopPrice() < midPrice) { //buy
 						contractlist.get(i).setCount( (contractlist.get(i).getCount()+1));	
