@@ -200,6 +200,7 @@ public class AccountInfoPanel extends JPanel implements INewTab, IAccountHandler
 			
 			// check if tag is net liquidation
 			if ( tag.equals("NetLiquidation") && type == 0) {
+				ApiDemo.INSTANCE.getDemoLogger().info("net liquidation: " + row.m_val);
 				if ( row.m_limited != 0 && Double.parseDouble(row.m_val) <= row.m_limited) {
 					row.m_limited = 0;
 					for (int i = 0;  i < m_portfolioModel.getRowCount(); i++) {
