@@ -123,9 +123,12 @@ class OrderTimerActionListener implements ActionListener {
 		ArrayList<TopRow> contractlist  =   ApiDemo.INSTANCE.m_mktDataPanel.getResultPanel().m_model.getRowsList();
 
 	    for (int i = 0; i < contractlist.size(); i++) {
-			if ( contractlist.get(i).getPosition() == 0) {
-				continue;
+			if ( contractlist.get(i).getCount() >= contractlist.get(i).getTradinglimit()) { // keep as odd number
+            
 			}
+			//if ( contractlist.get(i).getPosition() == 0) {
+			//	continue;
+			//}
 			
 			if ( Calendar.getInstance().before(contractlist.get(i).getStart())) {
 				ApiDemo.INSTANCE.getDemoLogger().fine("trading session not started, before: "+ dateFormat.format(contractlist.get(i).getStart().getTime()));

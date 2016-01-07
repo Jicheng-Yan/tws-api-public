@@ -112,7 +112,7 @@ class TopModel extends AbstractTableModel {
 		case 8:
 			return "Volume";
 		case 9:
-			return "StopPrice"; // jicheng
+			return "TradingLimit"; // jicheng
 		case 10:
 			return "Position";
 		case 11:
@@ -181,7 +181,7 @@ class TopModel extends AbstractTableModel {
 		case 8:
 			return Formats.fmt0(row.m_volume);
 		case 9:
-			return fmt(row.m_stop_price); // jicheng
+			return row.m_tradinglimit; // jicheng
 		case 10:
 			return row.m_position;
 		case 11:
@@ -244,6 +244,10 @@ class TopModel extends AbstractTableModel {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
 
 		switch (col) {
+		case 9:
+			row.m_tradinglimit = new Integer(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("trading limit: " + row.m_tradinglimit);
+			break;
 		case 15:
 			row.m_number = new Double(value.toString());
 			ApiDemo.INSTANCE.getDemoLogger().info("trading unit: " + value.toString());
@@ -322,7 +326,7 @@ class TopModel extends AbstractTableModel {
 		double m_close;
 		int m_volume;
 		boolean m_frozen;
-		double m_stop_price; // jicheng
+		int m_tradinglimit;
 		double m_number; // jicheng
 		double m_max; // jicheng
 		double m_min; // jicheng
@@ -351,7 +355,6 @@ class TopModel extends AbstractTableModel {
 			m_model = model;
 			m_contract = contract;
 			m_description = contract.description();
-			m_stop_price = -1; // jicheng
 			m_number = 0; // jicheng
 			m_max = 0; // jicheng
 			m_min = 0; // jicheng
@@ -364,6 +367,7 @@ class TopModel extends AbstractTableModel {
 			m_impVol_s = -1;
 			m_undPrice_s = -1;
 			m_optPrice_s = -1;
+			m_tradinglimit = 5;
 			
 			m_cal_start.set(Calendar.DAY_OF_MONTH, m_cal_start.get(Calendar.DAY_OF_MONTH)-1);
 			m_cal_start.set(Calendar.HOUR_OF_DAY, 17);
@@ -383,6 +387,13 @@ class TopModel extends AbstractTableModel {
 			return m_cal_end;
 		}
 
+		public  synchronized int getTradinglimit() {
+			return m_tradinglimit;
+		}
+
+		public  synchronized void setTradinglimit( int number) {
+			 m_tradinglimit = number;
+		}
 
 		public  synchronized int getPrePosition() {
 			return m_prePosition;
@@ -416,9 +427,6 @@ class TopModel extends AbstractTableModel {
 			return m_ask;
 		}
 
-		public double getStopPrice() {
-			return m_stop_price;
-		}
 
 		public double getNumber() {
 			return m_number;
