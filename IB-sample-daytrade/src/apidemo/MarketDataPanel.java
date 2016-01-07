@@ -124,7 +124,7 @@ class OrderTimerActionListener implements ActionListener {
 
 	    for (int i = 0; i < contractlist.size(); i++) {
 			if ( contractlist.get(i).getCount() >= contractlist.get(i).getTradinglimit()) { // keep as odd number
-            
+				continue;
 			}
 			//if ( contractlist.get(i).getPosition() == 0) {
 			//	continue;
