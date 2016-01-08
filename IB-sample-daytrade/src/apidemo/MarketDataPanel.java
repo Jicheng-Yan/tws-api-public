@@ -171,9 +171,9 @@ class OrderTimerActionListener implements ActionListener {
 					
 					ApiDemo.INSTANCE.getDemoLogger().info("buy "+row.getContract().description() + " " + Math.abs(row.getNumber()));
 					NewOrder order = new NewOrder();
-					order.orderType( OrderType.MKT);
-					//order.lmtPrice( 150);
-					order.tif( TimeInForce.GTC);
+					order.orderType( OrderType.LMT);
+					order.lmtPrice( row.getMin());
+					order.tif( TimeInForce.DAY);
 					//order.account("DU172556");
 
 					order.action(Action.BUY);
@@ -206,9 +206,9 @@ class OrderTimerActionListener implements ActionListener {
 
 					ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getNumber()));					
 					NewOrder order = new NewOrder();
-					order.orderType( OrderType.MKT);
-					//order.lmtPrice( 150);
-					order.tif( TimeInForce.GTC);
+					order.orderType( OrderType.LMT);
+					order.lmtPrice( row.getMax());
+					order.tif( TimeInForce.DAY);
 					//order.account("DU172556");
 					
 					order.action(Action.SELL);
