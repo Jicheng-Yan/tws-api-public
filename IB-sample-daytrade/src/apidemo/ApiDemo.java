@@ -148,11 +148,11 @@ public class ApiDemo implements IConnectionHandler {
 	            	} else if (record.getLevel().equals(Level.FINE)) {
 	            		b = false;
 	            	} else if (record.getLevel().equals(Level.FINER)) {
-	            		b = true;
+	            		b = false;
 	            	} else if (record.getLevel().equals(Level.FINEST)) {
-	            		b = true;
+	            		b = false;
 	            	} else if (record.getLevel().equals(Level.CONFIG)) {
-	            		b = true;
+	            		b = false;
 	            	}
 	            	
 	            	return b;

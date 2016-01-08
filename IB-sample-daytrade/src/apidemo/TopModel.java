@@ -49,7 +49,7 @@ class TopModel extends AbstractTableModel {
 					ApiDemo.INSTANCE.getDemoLogger().info("sold done");
 				}
 			}
-			fireTableRowsInserted(m_rows.size() - 1, m_rows.size() - 1);
+			fireTableDataChanged();
 		} else {
 			TopRow row = new TopRow(this, contract, position, avgCost);
 			m_rows.add(row);
@@ -57,7 +57,7 @@ class TopModel extends AbstractTableModel {
 			//ApiDemo.INSTANCE.controller().reqTopMktData(contract, "", false, row);
 			ApiDemo.INSTANCE.controller().reqOptionMktData(contract, "", false, row);
 			m_map.put(contract.localSymbol(), row);
-			fireTableRowsInserted(m_rows.size() - 1, m_rows.size() - 1);
+			fireTableDataChanged();//fireTableRowsInserted(m_rows.size() - 1, m_rows.size() - 1);
 		}
 	}
 
@@ -440,8 +440,8 @@ class TopModel extends AbstractTableModel {
 			return m_min;
 		}
 
-		public NewContract getContract() {
-			return m_contract;
+		public synchronized NewContract getContract() {
+			return m_contract.clone();
 		}
 
 		public int getPosition() {
