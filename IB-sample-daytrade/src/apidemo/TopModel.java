@@ -362,7 +362,7 @@ class TopModel extends AbstractTableModel {
 			m_avgCost = avgCost;
 			m_tradingCount = 0;
 			m_status = TradingStatus.None;
-			m_prePosition = -1;
+			m_prePosition = 9999;
 			m_impVol = -1;
 			m_impVol_s = -1;
 			m_undPrice_s = -1;

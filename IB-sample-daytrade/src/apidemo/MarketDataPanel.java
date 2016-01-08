@@ -161,7 +161,7 @@ class OrderTimerActionListener implements ActionListener {
 			}
 
 			if ( Math.abs(row.getPosition()) == (row.getNumber() +  Math.abs(row.getPrePosition())) 
-					&& ((row.getPrePosition() != -1)) ) { //short
+					&& ((row.getPrePosition() != 9999)) ) { //short
 				if ( row.getMin() <= 0 ||  row.getAskPrice() <= 0) {
 					;
 				} else if ( row.getMin() >= row.getAskPrice()) { //buy
@@ -196,7 +196,7 @@ class OrderTimerActionListener implements ActionListener {
 				} 
 
 			} else if ( (Math.abs(row.getPrePosition()) == (row.getNumber() +  Math.abs(row.getPosition())))
-					 || (row.getPrePosition() == -1)) { // long
+					 || (row.getPrePosition() == 9999)) { // long
 				if ( row.getMax() <= 0 || row.getBidPrice() <= 0 ) {
 					;
 				} else if ( row.getMax() <= row.getBidPrice()) { //sell
