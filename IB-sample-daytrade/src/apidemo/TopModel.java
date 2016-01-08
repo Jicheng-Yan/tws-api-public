@@ -441,7 +441,7 @@ class TopModel extends AbstractTableModel {
 		}
 
 		public synchronized NewContract getContract() {
-			return m_contract.clone();
+			return m_contract;
 		}
 
 		public int getPosition() {
