@@ -213,7 +213,7 @@ public class ApiDemo implements IConnectionHandler {
 		m_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// make initial connection to local host, port 7496, client id 10
-		m_controller.connect("127.0.0.1", 7496, 10);
+		//m_controller.connect("127.0.0.1", 7496, 0);
 	}
 	
 
