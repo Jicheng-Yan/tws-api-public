@@ -76,7 +76,6 @@ public class PositionsPanel extends NewTabPanel {
 		ArrayList<PositionRow> m_list = new ArrayList<PositionRow>();
 
 		@Override public void position(String account, NewContract contract, int position, double avgCost) {
-// jicheng
 			ApiDemo.INSTANCE.m_mktDataPanel.addContract( contract, 0, 0);
 			PositionKey key = new PositionKey( account, contract.conid() );
 			PositionRow row = m_map.get( key);

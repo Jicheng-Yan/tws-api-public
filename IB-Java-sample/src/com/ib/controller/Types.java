@@ -201,7 +201,7 @@ public class Types {
 	}
 
 	public static enum  TradingStatus {
-		None,  Selling, sold, buying, bought;
+		Init,  Selling, sold, buying, boughtA, boughtB;
 		
 		public String getApiString() {
 			return super.toString();
@@ -209,10 +209,12 @@ public class Types {
 
 		@Override public String toString() {
 			switch( this) {
+				case Init: 		return "Init";
 				case Selling: 	return "Selling";
 				case sold:		return "sold";
 				case buying:	return "buying";
-				case bought:	return "bought";
+				case boughtA:	return "boughtA";
+				case boughtB:	return "boughtB";
 				default:					return null;
 			}
 		}

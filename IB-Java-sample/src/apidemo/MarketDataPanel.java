@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -113,7 +114,6 @@ class PositionOrderAdapter implements IPositionHandler, ILiveOrderHandler {
 }
 
 class OrderTimerActionListener implements ActionListener {
-	NewContract contract;
 	
 	public void actionPerformed(ActionEvent e) {
 	    
@@ -122,73 +122,66 @@ class OrderTimerActionListener implements ActionListener {
 
 		ArrayList<TopRow> contractlist  =   ApiDemo.INSTANCE.m_mktDataPanel.getResultPanel().m_model.getRowsList();
 
-	    for (int i = 0; i < contractlist.size(); i++) {
-			if ( contractlist.get(i).getCount() >= contractlist.get(i).getTradinglimit()) { // keep as odd number
-				//contractlist.get(i).setCount(0);
-				//contractlist.get(i).setStopPrice(contractlist.get(i).getStopPrice()*1.05);
-				ApiDemo.INSTANCE.getDemoLogger().info("trading over the limit ");
-				continue;
-			}
+		Iterator<TopRow> itr = contractlist.iterator();
+		while (itr.hasNext()) {
+			TopRow row = itr.next();
 			
-			if ( Calendar.getInstance().before(contractlist.get(i).getStart())) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("trading session not started, before: "+ dateFormat.format(contractlist.get(i).getStart().getTime()));
+			if ( Calendar.getInstance().before(row.getStart())) {
+				ApiDemo.INSTANCE.getDemoLogger().fine("trading session not started, before: "+ dateFormat.format(row.getStart().getTime()));
 				continue;
 			}
 
-			if ( Calendar.getInstance().after(contractlist.get(i).getEnd())) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("trading session has finished, after: "+ dateFormat.format(contractlist.get(i).getEnd().getTime()));
+			if ( Calendar.getInstance().after(row.getEnd())) {
+				ApiDemo.INSTANCE.getDemoLogger().fine("trading session has finished, after: "+ dateFormat.format(row.getEnd().getTime()));
 				continue;
 			}
-			
 
-			if ( contractlist.get(i).getStopPrice() == -1) {
+			if ( row.getStopPrice() == -1) {
 				ApiDemo.INSTANCE.getDemoLogger().fine("stop price is not set");
 				continue;
 			}
 			
-			if ( contractlist.get(i).getAskPrice() <= 0 || contractlist.get(i).getBidPrice() <= 0 ) {
-				ApiDemo.INSTANCE.getDemoLogger().info("bid or ask is not normal - bid: " + contractlist.get(i).getContract().description() + contractlist.get(i).getBidPrice() + " ask: " + contractlist.get(i).getAskPrice());
+			if ( row.getAskPrice() <= 0 || row.getBidPrice() <= 0 ) {
+				ApiDemo.INSTANCE.getDemoLogger().info("bid or ask is not normal - bid: " + row.getContract().description() + row.getBidPrice() + " ask: " + row.getAskPrice());
 				continue;
 			}
 			
-			if ( (contractlist.get(i).getAskPrice() - contractlist.get(i).getBidPrice())/contractlist.get(i).getAskPrice() >= 0.2) {
-				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask - bid: " + contractlist.get(i).getContract().description() + contractlist.get(i).getBidPrice() + " ask: " + contractlist.get(i).getAskPrice());
+			if ( (row.getAskPrice() - row.getBidPrice())/row.getAskPrice() >= 0.2) {
+				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask - bid: " + row.getContract().description() + row.getBidPrice() + " ask: " + row.getAskPrice());
 				continue;
 			}
 
-			if ( contractlist.get(i).getStatus()== TradingStatus.Selling || contractlist.get(i).getStatus() == TradingStatus.buying) {
-				ApiDemo.INSTANCE.getDemoLogger().info("" + contractlist.get(i).getContract().description() + "order not finished yet");
+			if ( row.getStatus()== TradingStatus.Selling || row.getStatus() == TradingStatus.buying) {
+				ApiDemo.INSTANCE.getDemoLogger().info("" + row.getContract().description() + "order not finished yet");
 				continue;
 			}
 
-			double midPrice = Math.round( (contractlist.get(i).getBidPrice() + contractlist.get(i).getAskPrice())/2*100)/100.0 ;
+			double midPrice = Math.round( (row.getBidPrice() + row.getAskPrice())/2*100)/100.0 ;
 			ApiDemo.INSTANCE.getDemoLogger().fine("mid price is " + midPrice);
 			
-			contract = contractlist.get(i).getContract();
-			//contract.conid(0);
-			contract.exchange("GLOBEX");
-			contract.primaryExch("");
+			if (row.getStatus() == TradingStatus.Init) {
+				if ( row.getStopPrice() < midPrice) { //buy
+					row.setCount( (row.getCount()+1));
+					row.setStatus(TradingStatus.buying);
+					ApiDemo.INSTANCE.getDemoLogger().info("statu change: Init->buying");
 
-			if ( contractlist.get(i).getPosition() < 0 ) { //short
-				if ( contractlist.get(i).getStopPrice() < midPrice) { //buy
-					contractlist.get(i).setCount( (contractlist.get(i).getCount()+1));
-					contractlist.get(i).setStatus(TradingStatus.buying);
-					contractlist.get(i).setPrePosition( contractlist.get(i).getPosition());
+					row.setPrePosition( row.getPosition());
 					
-					ApiDemo.INSTANCE.getDemoLogger().info("buy "+contract.description() + " " + Math.abs(contractlist.get(i).getPosition()) + "mid: " + midPrice);
+					ApiDemo.INSTANCE.getDemoLogger().info("buy "+ row.getContract().description() + " " + Math.abs(row.getPosition()) + "mid: " + midPrice);
 					NewOrder order = new NewOrder();
 					order.orderType( OrderType.MKT);
 					//order.lmtPrice( 150);
-					order.tif( TimeInForce.GTC);
+					order.tif( TimeInForce.DAY);
 					//order.account("DU172556");
 
 					order.action(Action.BUY);
 					order.outsideRth(true);
-					order.totalQuantity( Math.abs(contractlist.get(i).getPosition()));
+					order.totalQuantity( Math.abs(row.getPosition()));
+					row.getContract().exchange("GLOBEX");
 
-					ApiDemo.INSTANCE.controller().placeOrModifyOrder( contract, order, new IOrderHandler() {
+					ApiDemo.INSTANCE.controller().placeOrModifyOrder( row.getContract(), order, new IOrderHandler() {
 						@Override public void orderState(NewOrderState orderState) {
-							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+						ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						    System.out.println("order placed");						
 						}
 						@Override public void orderStatus(OrderStatus status, int filled, int remaining, double avgFillPrice, long permId, int parentId, double lastFillPrice, int clientId, String whyHeld) {
@@ -196,87 +189,43 @@ class OrderTimerActionListener implements ActionListener {
 						@Override public void handle(int errorCode, final String errorMsg) {
 						}
 					});
-
-				} 
-            /* only sell,  do not maintain long position
-			} else if ( contractlist.get(i).getPosition() > 0) { // long
-				if (contractlist.get(i).getStopPrice() > midPrice) { //sell
-					contractlist.get(i).setCount( (contractlist.get(i).getCount()+1));
-					contractlist.get(i).setStatus(TradingStatus.Selling);
-					contractlist.get(i).setPrePosition( contractlist.get(i).getPosition());
-
-					ApiDemo.INSTANCE.getDemoLogger().info("sell "+contract.description() + " " + Math.abs(contractlist.get(i).getPosition())  + "mid: " + midPrice);					
-					NewOrder order = new NewOrder();
-					order.orderType( OrderType.MKT);
-					//order.lmtPrice( 150);
-					order.tif( TimeInForce.GTC);
-					//order.account("DU172556");
 					
-					order.action(Action.SELL);
-					order.outsideRth(true);
-					order.totalQuantity( (int)Math.abs(contractlist.get(i).getPosition()));
-
-					ApiDemo.INSTANCE.controller().placeOrModifyOrder( contract, order, new IOrderHandler() {
-						@Override public void orderState(NewOrderState orderState) {
-							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
-						    System.out.println("order placed");						
-						}
-						@Override public void orderStatus(OrderStatus status, int filled, int remaining, double avgFillPrice, long permId, int parentId, double lastFillPrice, int clientId, String whyHeld) {
-						}
-						@Override public void handle(int errorCode, final String errorMsg) {
-						}
-					});
-
 				}
-			*/	
-			} else if ( contractlist.get(i).getPosition() == 0) { // 0 position, waiting for restore position
-				if ( contractlist.get(i).getStatus() == TradingStatus.sold) { // need buy back
-					if (contractlist.get(i).getStopPrice() < midPrice) { //buy
-						contractlist.get(i).setCount( (contractlist.get(i).getCount()+1));	
-						contractlist.get(i).setStatus(TradingStatus.buying);
-
-						ApiDemo.INSTANCE.getDemoLogger().info("buy "+contract.description() + " " + Math.abs(contractlist.get(i).getPrePosition())   + "mid: " + midPrice);						
-						NewOrder order = new NewOrder();
-						order.orderType( OrderType.MKT);
-						//order.lmtPrice( 150);
-						order.tif( TimeInForce.GTC);
-						//order.account("DU172556");
-						
-						order.action(Action.BUY);
-						order.outsideRth(true);
-						order.totalQuantity( (int)Math.abs(contractlist.get(i).getPrePosition()));
-						contractlist.get(i).setPrePosition(0);
-
-						ApiDemo.INSTANCE.controller().placeOrModifyOrder( contract, order, new IOrderHandler() {
-							@Override public void orderState(NewOrderState orderState) {
-								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
-							    System.out.println("order placed");						
-							}
-							@Override public void orderStatus(OrderStatus status, int filled, int remaining, double avgFillPrice, long permId, int parentId, double lastFillPrice, int clientId, String whyHeld) {
-							}
-							@Override public void handle(int errorCode, final String errorMsg) {
-							}
-						});
-
+			} else if (row.getStatus() == TradingStatus.buying) {
+					if (row.getPosition() == 0 ) {
+						if ( row.getStopPrice() + row.getOffset()< midPrice  ) {
+							row.setStatus(TradingStatus.boughtB);
+							ApiDemo.INSTANCE.getDemoLogger().info("statu change: buying->boughtB");
+						} else if (row.getStopPrice() + row.getOffset() >= midPrice) {
+							row.setStatus(TradingStatus.boughtA);
+							ApiDemo.INSTANCE.getDemoLogger().info("statu change: buying->boughtA");
+						}
 					}
-				} else if (contractlist.get(i).getStatus() == TradingStatus.bought) { // need to sell
-					if (contractlist.get(i).getStopPrice() > midPrice) { //sell
-						contractlist.get(i).setCount( (contractlist.get(i).getCount()+1));
-						contractlist.get(i).setStatus(TradingStatus.Selling);
+			} else if (row.getStatus() == TradingStatus.boughtA) {
+					if ( row.getStopPrice() + row.getOffset() < midPrice  ) {
+						row.setStatus(TradingStatus.boughtB);
+						ApiDemo.INSTANCE.getDemoLogger().info("statu change: buyingA->boughtB");
+					}
+			} else if (row.getStatus() == TradingStatus.boughtB) {
+					if (row.getStopPrice() + row.getOffset() > midPrice) { //sell
+						row.setCount( (row.getCount()+1));
+						row.setStatus(TradingStatus.Selling);
+						ApiDemo.INSTANCE.getDemoLogger().info("statu change: boughtB->Selling");
 						
-						ApiDemo.INSTANCE.getDemoLogger().info("sell "+contract.description() + " " + Math.abs(contractlist.get(i).getPrePosition())   + "mid: " + midPrice);
+						ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getPrePosition())   + "mid: " + midPrice);
 						NewOrder order = new NewOrder();
 						order.orderType( OrderType.MKT);
 						//order.lmtPrice( 150);
-						order.tif( TimeInForce.GTC);
+						order.tif( TimeInForce.DAY);
 						//order.account("DU172556");
 					
 						order.action(Action.SELL);
 						order.outsideRth(true);
-						order.totalQuantity( (int)Math.abs(contractlist.get(i).getPrePosition()));
-						contractlist.get(i).setPrePosition(0);
+						order.totalQuantity( (int)Math.abs(row.getPrePosition()));
+						row.setPrePosition(0);
+						row.getContract().exchange("GLOBEX");
 
-						ApiDemo.INSTANCE.controller().placeOrModifyOrder( contract, order, new IOrderHandler() {
+						ApiDemo.INSTANCE.controller().placeOrModifyOrder( row.getContract(), order, new IOrderHandler() {
 							@Override public void orderState(NewOrderState orderState) {
 								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 							    System.out.println("order placed");						
@@ -286,38 +235,45 @@ class OrderTimerActionListener implements ActionListener {
 							@Override public void handle(int errorCode, final String errorMsg) {
 							}
 						});
+					}
+			} else if (row.getStatus() == TradingStatus.Selling) {
+					if (row.getPosition() == row.getPrePosition() ) {
+							row.setStatus(TradingStatus.sold);
+							row.setStopPrice( row.getStopPrice() + row.getOffset());
+							ApiDemo.INSTANCE.getDemoLogger().info("statu change: Selling->Sold");
+					}
+			} else if (row.getStatus() == TradingStatus.sold) {
+					if ( row.getStopPrice() < midPrice) { //buy
+						row.setCount( (row.getCount()+1));
+						row.setStatus(TradingStatus.buying);
+						ApiDemo.INSTANCE.getDemoLogger().info("statu change: Sold->buying");
+						row.setPrePosition( row.getPosition());
+						
+						ApiDemo.INSTANCE.getDemoLogger().info("buy "+row.getContract().description() + " " + Math.abs(row.getPosition()) + "mid: " + midPrice);
+						NewOrder order = new NewOrder();
+						order.orderType( OrderType.MKT);
+						//order.lmtPrice( 150);
+						order.tif( TimeInForce.DAY);
+						//order.account("DU172556");
 
-					}
-				}
-			}
-			/*
-			System.out.println(contractlist.get(i).getdescription());
-			if (contractlist.get(i).getdescription().equals("ES FOP 20151218 2010.0 Call") == true) {
-				contract = contractlist.get(i).getContract();
-				order = contractlist.get(i).getOrder();
-				
-				contract.exchange("GLOBEX");
-				contract.primaryExch("");
-				
-				order.action(Action.SELL);
-				order.totalQuantity( Math.abs(1));
-				order.orderType( OrderType.LMT);
-				order.lmtPrice( 150);
-				order.tif( TimeInForce.DAY);
+						order.action(Action.BUY);
+						order.outsideRth(true);
+						order.totalQuantity( Math.abs(row.getPosition()));
 
-				ApiDemo.INSTANCE.controller().placeOrModifyOrder( contract, order, new IOrderHandler() {
-					@Override public void orderState(NewOrderState orderState) {
-						ApiDemo.INSTANCE.controller().removeOrderHandler( this);
-					    System.out.println("order placed");						
+						row.getContract().exchange("GLOBEX");
+
+						ApiDemo.INSTANCE.controller().placeOrModifyOrder( row.getContract(), order, new IOrderHandler() {
+							@Override public void orderState(NewOrderState orderState) {
+							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							    System.out.println("order placed");						
+							}
+							@Override public void orderStatus(OrderStatus status, int filled, int remaining, double avgFillPrice, long permId, int parentId, double lastFillPrice, int clientId, String whyHeld) {
+							}
+							@Override public void handle(int errorCode, final String errorMsg) {
+							}
+						});
 					}
-					@Override public void orderStatus(OrderStatus status, int filled, int remaining, double avgFillPrice, long permId, int parentId, double lastFillPrice, int clientId, String whyHeld) {
-					}
-					@Override public void handle(int errorCode, final String errorMsg) {
-					}
-				});
-			}*/
-		}
-	    
+			}}
 	  }
 }
 
@@ -356,7 +312,7 @@ public class MarketDataPanel extends JPanel {
 		//timer.start();
 	    //ApiDemo.INSTANCE.controller().reqPositions(ApiDemo.INSTANCE.m_mktDataPanel.getCallback());
 
-	    Timer ordertimer = new Timer(1000, new OrderTimerActionListener()); // 5 min
+	    Timer ordertimer = new Timer(300, new OrderTimerActionListener()); // 5 min
 	    ordertimer.start();
 	}
 
@@ -397,7 +353,7 @@ public class MarketDataPanel extends JPanel {
 		//		m_topResultPanel = new TopResultsPanel();
 		//		m_resultsPanel.addTab( "Top Data", m_topResultPanel, true, true);
 		//	}
-			m_topResultPanel.m_model.addRow( m_contract, 0, 0);
+			m_topResultPanel.m_model.addRow( m_contract.clone(), 0, 0);
 			
 		}
 	}

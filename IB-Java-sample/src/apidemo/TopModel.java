@@ -37,23 +37,6 @@ class TopModel extends AbstractTableModel {
 			full.updateContract(contract);
 			//ApiDemo.INSTANCE.controller().reqTopMktData(contract, "", false, full);
 			full.setPosition(position);
-			if ( position == 0 && full.getPrePosition() != 0) {
-				if (full.getStatus() == TradingStatus.buying) {
-					full.setStatus( TradingStatus.bought);
-					ApiDemo.INSTANCE.getDemoLogger().info("bought done");
-				} else if  ( full.getStatus() == TradingStatus.Selling) {
-					full.setStatus( TradingStatus.sold);
-					ApiDemo.INSTANCE.getDemoLogger().info("sold done");
-				}
-			} else if (position != 0 && full.getPrePosition() == 0) {
-				if (full.getStatus() == TradingStatus.buying) {
-					full.setStatus( TradingStatus.bought);
-					ApiDemo.INSTANCE.getDemoLogger().info("bought done");
-				} else if  ( full.getStatus() == TradingStatus.Selling) {
-					full.setStatus( TradingStatus.sold);
-					ApiDemo.INSTANCE.getDemoLogger().info("sold done");
-				}
-			}
 			fireTableRowsInserted( m_rows.size() - 1, m_rows.size() - 1);
 		}
 		else {
@@ -110,9 +93,9 @@ class TopModel extends AbstractTableModel {
 			case 12: return "PrePosition";  //jicheng
 			case 13: return "TradingCount";
 			case 14: return "TradingStatus";
-			case 15: return "TradingLimit";
-			case 16: return "start";
-			case 17: return "end";
+			case 15: return "Offset";
+			case 16: return "Start";
+			case 17: return "End";
 			default: return null;
 		}
 	}
@@ -135,7 +118,7 @@ class TopModel extends AbstractTableModel {
 			case 12: return row.m_prePosition;
 			case 13: return row.m_tradingCount;  // jicheng
 			case 14: return row.m_status.toString();  // jicheng
-			case 15: return row.m_tradinglimit;  // jicheng
+			case 15: return row.m_offset;  // jicheng
 			case 16: 
 				return (new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss")).format(row.m_cal_start.getTime());				
 			case 17: 
@@ -160,8 +143,8 @@ class TopModel extends AbstractTableModel {
 			row.m_stop_price = new Double(value.toString());
 			ApiDemo.INSTANCE.getDemoLogger().info("stop price set: " + row.m_stop_price);
 		} else if ( col == 15 ) {
-			row.m_tradinglimit = new Integer(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("trading limit: " + row.m_tradinglimit);
+			row.m_offset = new Integer(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("offset: " + row.m_offset);
 		} else if ( col == 16 ) {
 			try {
 				row.m_cal_start.setTime(sdf.parse(value.toString()));
@@ -213,7 +196,7 @@ class TopModel extends AbstractTableModel {
 		double m_avgCost;
 		int m_tradingCount;
 		TradingStatus m_status;
-		int m_tradinglimit;
+		int m_offset;
 		Calendar m_cal_start = Calendar.getInstance(); 
 		Calendar m_cal_end = Calendar.getInstance();
 
@@ -226,9 +209,9 @@ class TopModel extends AbstractTableModel {
 			m_position = position;
 			m_avgCost = avgCost;
 			m_tradingCount = 0;
-			m_status = TradingStatus.None;
+			m_status = TradingStatus.Init;
 			m_prePosition = 0;
-			m_tradinglimit = 5;
+			m_offset = 2;
 			
 			m_cal_start.set(Calendar.DAY_OF_MONTH, m_cal_start.get(Calendar.DAY_OF_MONTH)-1);
 			m_cal_start.set(Calendar.HOUR_OF_DAY, 17);
@@ -248,12 +231,12 @@ class TopModel extends AbstractTableModel {
 			return m_cal_end;
 		}
 
-		public  synchronized int getTradinglimit() {
-			return m_tradinglimit;
-		}
-
-		public  synchronized void setTradinglimit( int number) {
-			 m_tradinglimit = number;
+		public  synchronized int getOffset() {
+			return m_offset;
+		}			
+					
+		public  synchronized void setOffset( int number) {
+			 m_offset = number;
 		}
 
 		public  synchronized int getPrePosition() {

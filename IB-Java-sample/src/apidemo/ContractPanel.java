@@ -35,10 +35,11 @@ public class ContractPanel extends JPanel {
 		m_contract = c;
 
 		if (c.secType() == SecType.None) {
-			m_symbol.setText( "IBM");
-			m_secType.setSelectedItem( SecType.STK);
-			m_exchange.setText( "SMART");
-			m_compExch.setText( "ISLAND");
+			m_symbol.setText( "ES");
+			m_secType.setSelectedItem( SecType.FOP);
+			m_multiplier.setText("50");
+			m_exchange.setText( "GLOBEX");
+			//m_compExch.setText( "ISLAND");
 			m_currency.setText( "USD");
 		}
 		else {

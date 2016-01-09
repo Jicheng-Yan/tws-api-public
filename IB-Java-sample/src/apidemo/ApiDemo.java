@@ -152,11 +152,11 @@ public class ApiDemo implements IConnectionHandler {
 	            	} else if (record.getLevel().equals(Level.FINE)) {
 	            		b = false;
 	            	} else if (record.getLevel().equals(Level.FINER)) {
-	            		b = true;
+	            		b = false;
 	            	} else if (record.getLevel().equals(Level.FINEST)) {
-	            		b = true;
+	            		b = false;
 	            	} else if (record.getLevel().equals(Level.CONFIG)) {
-	            		b = true;
+	            		b = false;
 	            	}
 	            	
 	            	return b;
@@ -217,7 +217,7 @@ public class ApiDemo implements IConnectionHandler {
 		m_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// make initial connection to local host, port 7496, client id 10
-		m_controller.connect("127.0.0.1", 7496, 0);
+		//m_controller.connect("127.0.0.1", 7496, 0);
 	}
 	
 
