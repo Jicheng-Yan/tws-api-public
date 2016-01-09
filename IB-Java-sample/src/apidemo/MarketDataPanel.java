@@ -160,7 +160,7 @@ class OrderTimerActionListener implements ActionListener {
 			ApiDemo.INSTANCE.getDemoLogger().fine("mid price is " + midPrice);
 			
 			if (row.getStatus() == TradingStatus.Init) {
-				if ( row.getStopPrice() < midPrice) { //buy
+				if ( row.getStopPrice() < midPrice && row.getPosition() < 0) { //buy
 					row.setCount( (row.getCount()+1));
 					row.setStatus(TradingStatus.buying);
 					ApiDemo.INSTANCE.getDemoLogger().info("statu change: Init->buying");
