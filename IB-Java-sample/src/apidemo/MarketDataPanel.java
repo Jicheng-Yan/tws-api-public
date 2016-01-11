@@ -100,11 +100,11 @@ class PositionOrderAdapter implements IPositionHandler, ILiveOrderHandler {
 		if ( contract.secType() == SecType.FOP ) {
 			contract.exchange("GLOBEX");
 			contract.primaryExch("");
+			ApiDemo.INSTANCE.getDemoLogger().info("position update:" + contract.description());
+			ApiDemo.INSTANCE.m_mktDataPanel.addContract( contract, position, avgCost);
 		} else if ( contract.secType() == SecType.OPT ) {
 			contract.exchange("SMART");
 		}
-		ApiDemo.INSTANCE.getDemoLogger().info("position update:" + contract.description());
-		ApiDemo.INSTANCE.m_mktDataPanel.addContract( contract, position, avgCost);
 	}
 
 	@Override
