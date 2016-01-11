@@ -129,20 +129,7 @@ public class ApiDemo implements IConnectionHandler {
 	        handler.setFormatter(new MyFormatter());  // Set the log format
 	        handler.setFilter(new Filter() {
 	            public boolean isLoggable(LogRecord record) {
-	                //
-	                // When the LogRecord level is equals to Level.SEVERE the 
-	                // message is recorded to the file.
-	                //
 	            	boolean b = false;
-	            	
-	            	if ( ApiDemo.INSTANCE.m_lastLog.getMessage().equals(record.getMessage())) {
-	            		b = false;
-	            		return b;
-	            	} else {
-	            		ApiDemo.INSTANCE.m_lastLog.setMessage(record.getMessage());
-	            	}
-	            		
-
 	            	if (record.getLevel().equals(Level.SEVERE)) {
 	            		b = true;
 	            	} else if (record.getLevel().equals(Level.WARNING)) {

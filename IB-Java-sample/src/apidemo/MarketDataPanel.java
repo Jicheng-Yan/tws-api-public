@@ -126,6 +126,7 @@ class OrderTimerActionListener implements ActionListener {
 		while (itr.hasNext()) {
 			TopRow row = itr.next();
 			
+			
 			if ( Calendar.getInstance().before(row.getStart())) {
 				ApiDemo.INSTANCE.getDemoLogger().fine("trading session not started, before: "+ dateFormat.format(row.getStart().getTime()));
 				continue;
@@ -135,6 +136,7 @@ class OrderTimerActionListener implements ActionListener {
 				ApiDemo.INSTANCE.getDemoLogger().fine("trading session has finished, after: "+ dateFormat.format(row.getEnd().getTime()));
 				continue;
 			}
+			
 
 			if ( row.getStopPrice() == -1) {
 				ApiDemo.INSTANCE.getDemoLogger().fine("stop price is not set");
@@ -151,10 +153,12 @@ class OrderTimerActionListener implements ActionListener {
 				continue;
 			}
 
+			/*	
 			if ( row.getStatus()== TradingStatus.Selling || row.getStatus() == TradingStatus.buying) {
 				ApiDemo.INSTANCE.getDemoLogger().info("" + row.getContract().description() + "order not finished yet");
 				continue;
 			}
+			*/
 
 			double midPrice = Math.round( (row.getBidPrice() + row.getAskPrice())/2*100)/100.0 ;
 			ApiDemo.INSTANCE.getDemoLogger().fine("mid price is " + midPrice);
@@ -163,7 +167,7 @@ class OrderTimerActionListener implements ActionListener {
 				if ( row.getStopPrice() < midPrice && row.getPosition() < 0) { //buy
 					row.setCount( (row.getCount()+1));
 					row.setStatus(TradingStatus.buying);
-					ApiDemo.INSTANCE.getDemoLogger().info("statu change: Init->buying");
+					ApiDemo.INSTANCE.getDemoLogger().info("status change: Init->buying");
 
 					row.setPrePosition( row.getPosition());
 					
@@ -195,22 +199,22 @@ class OrderTimerActionListener implements ActionListener {
 					if (row.getPosition() == 0 ) {
 						if ( row.getStopPrice() + row.getOffset()< midPrice  ) {
 							row.setStatus(TradingStatus.boughtB);
-							ApiDemo.INSTANCE.getDemoLogger().info("statu change: buying->boughtB");
+							ApiDemo.INSTANCE.getDemoLogger().info("status change: buying->boughtB");
 						} else if (row.getStopPrice() + row.getOffset() >= midPrice) {
 							row.setStatus(TradingStatus.boughtA);
-							ApiDemo.INSTANCE.getDemoLogger().info("statu change: buying->boughtA");
+							ApiDemo.INSTANCE.getDemoLogger().info("status change: buying->boughtA");
 						}
 					}
 			} else if (row.getStatus() == TradingStatus.boughtA) {
 					if ( row.getStopPrice() + row.getOffset() < midPrice  ) {
 						row.setStatus(TradingStatus.boughtB);
-						ApiDemo.INSTANCE.getDemoLogger().info("statu change: buyingA->boughtB");
+						ApiDemo.INSTANCE.getDemoLogger().info("status change: buyingA->boughtB");
 					}
 			} else if (row.getStatus() == TradingStatus.boughtB) {
 					if (row.getStopPrice() + row.getOffset() > midPrice) { //sell
 						row.setCount( (row.getCount()+1));
 						row.setStatus(TradingStatus.Selling);
-						ApiDemo.INSTANCE.getDemoLogger().info("statu change: boughtB->Selling");
+						ApiDemo.INSTANCE.getDemoLogger().info("status change: boughtB->Selling");
 						
 						ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getPrePosition())   + "mid: " + midPrice);
 						NewOrder order = new NewOrder();
@@ -240,13 +244,14 @@ class OrderTimerActionListener implements ActionListener {
 					if (row.getPosition() == row.getPrePosition() ) {
 							row.setStatus(TradingStatus.sold);
 							row.setStopPrice( row.getStopPrice() + row.getOffset());
-							ApiDemo.INSTANCE.getDemoLogger().info("statu change: Selling->Sold");
+							ApiDemo.INSTANCE.getDemoLogger().info("status change: Selling->Sold");
+							ApiDemo.INSTANCE.getDemoLogger().info("stop price changed to: " + row.getStopPrice());
 					}
 			} else if (row.getStatus() == TradingStatus.sold) {
 					if ( row.getStopPrice() < midPrice) { //buy
 						row.setCount( (row.getCount()+1));
 						row.setStatus(TradingStatus.buying);
-						ApiDemo.INSTANCE.getDemoLogger().info("statu change: Sold->buying");
+						ApiDemo.INSTANCE.getDemoLogger().info("status change: Sold->buying");
 						row.setPrePosition( row.getPosition());
 						
 						ApiDemo.INSTANCE.getDemoLogger().info("buy "+row.getContract().description() + " " + Math.abs(row.getPosition()) + "mid: " + midPrice);

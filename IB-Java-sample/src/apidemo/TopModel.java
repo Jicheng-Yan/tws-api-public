@@ -210,7 +210,7 @@ class TopModel extends AbstractTableModel {
 			m_avgCost = avgCost;
 			m_tradingCount = 0;
 			m_status = TradingStatus.Init;
-			m_prePosition = 0;
+			m_prePosition = 9999;
 			m_offset = 2;
 			
 			m_cal_start.set(Calendar.DAY_OF_MONTH, m_cal_start.get(Calendar.DAY_OF_MONTH)-1);
