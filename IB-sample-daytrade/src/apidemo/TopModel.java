@@ -38,17 +38,6 @@ class TopModel extends AbstractTableModel {
 			full.updateContract(contract);
 			//ApiDemo.INSTANCE.controller().reqTopMktData(contract, "", false, full);
 			full.setPosition(position);
-			if (full.getStatus() == TradingStatus.buying)  {
-				if ( Math.abs(full.getPrePosition()) == Math.abs(position) + full.getNumber()) {
-					full.setStatus(TradingStatus.bought);
-					ApiDemo.INSTANCE.getDemoLogger().info("bought done");
-				}
-			} else if (full.getStatus() == TradingStatus.Selling) {
-				if ( Math.abs(position) == Math.abs(full.getPrePosition()) + full.getNumber()) {
-					full.setStatus(TradingStatus.sold);
-					ApiDemo.INSTANCE.getDemoLogger().info("sold done");
-				}
-			}
 			fireTableDataChanged();
 		} else {
 			TopRow row = new TopRow(this, contract, position, avgCost);
@@ -230,7 +219,7 @@ class TopModel extends AbstractTableModel {
 
 	@Override
 	public boolean isCellEditable(int rowSet, int col) {
-		if (col == 9 || col == 15 || col == 16  || col == 17 
+		if (col == 9 || col == 12 || col == 14 || col == 15 || col == 16  || col == 17 
 		 || col == 25 || col == 26 || col == 28 || col == 29) {
 			return true;
 		} else {
@@ -247,6 +236,26 @@ class TopModel extends AbstractTableModel {
 		case 9:
 			row.m_tradinglimit = new Integer(value.toString());
 			ApiDemo.INSTANCE.getDemoLogger().info("trading limit: " + row.m_tradinglimit);
+			break;
+		case 12:
+			row.m_prePosition = new Integer(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("prePosition changed to: " + value.toString());
+			fireTableDataChanged();
+			break;
+		case 14:
+			if (value.toString().equals("None")) {
+				row.setStatus(TradingStatus.None);
+			} else if (value.toString().equals("Selling")) {
+				row.setStatus(TradingStatus.Selling);
+			} else if (value.toString().equals("sold")) {
+				row.setStatus(TradingStatus.sold);
+			} else if (value.toString().equals("buying")) {
+				row.setStatus(TradingStatus.buying);
+			} else if (value.toString().equals("bought")) {
+				row.setStatus(TradingStatus.bought);
+			}
+			ApiDemo.INSTANCE.getDemoLogger().info("status changed to: " + value.toString());
+			fireTableDataChanged();
 			break;
 		case 15:
 			row.m_number = new Double(value.toString());

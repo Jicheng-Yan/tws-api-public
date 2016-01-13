@@ -209,6 +209,7 @@ public class Types {
 
 		@Override public String toString() {
 			switch( this) {
+				case None: 		return "None";			
 				case Selling: 	return "Selling";
 				case sold:		return "sold";
 				case buying:	return "buying";
