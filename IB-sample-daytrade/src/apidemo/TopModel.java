@@ -20,13 +20,16 @@ import javax.swing.table.TableCellRenderer;
 
 import com.ib.controller.ApiController.IOptHandler;
 import com.ib.controller.ApiController.IOrderHandler;
+import com.ib.controller.ApiController.IRealTimeBarHandler;
 import com.ib.controller.ApiController.TopMktDataAdapter;
+import com.ib.controller.Bar;
 import com.ib.controller.Formats;
 import com.ib.controller.NewContract;
 import com.ib.controller.NewOrder;
 import com.ib.controller.NewTickType;
 import com.ib.controller.Types.MktDataType;
 import com.ib.controller.Types.TradingStatus;
+import com.ib.controller.Types.WhatToShow;
 
 class TopModel extends AbstractTableModel {
 	private HashMap<String, TopRow> m_map = new HashMap<String, TopRow>();
@@ -45,6 +48,7 @@ class TopModel extends AbstractTableModel {
 			ApiDemo.INSTANCE.getDemoLogger().info( "requested market data for:" + contract.description());
 			//ApiDemo.INSTANCE.controller().reqTopMktData(contract, "", false, row);
 			ApiDemo.INSTANCE.controller().reqOptionMktData(contract, "", false, row);
+			ApiDemo.INSTANCE.controller().reqRealTimeBars(contract, WhatToShow.MIDPOINT, false, row);
 			m_map.put(contract.localSymbol(), row);
 			fireTableDataChanged();//fireTableRowsInserted(m_rows.size() - 1, m_rows.size() - 1);
 		}
@@ -76,7 +80,7 @@ class TopModel extends AbstractTableModel {
 
 	@Override
 	public int getColumnCount() {
-		return 30;
+		return 34;
 	}
 
 	@Override
@@ -101,46 +105,54 @@ class TopModel extends AbstractTableModel {
 		case 8:
 			return "Volume";
 		case 9:
-			return "TradingLimit"; // jicheng
-		case 10:
-			return "Position";
-		case 11:
 			return "AvgCost"; // jicheng
+		case 10:
+			return "5mBar"; // jicheng
+		case 11:
+			return "Position";
 		case 12:
 			return "PrePosition"; // jicheng
 		case 13:
-			return "T-Count";
+			return "BOX#Limit"; // jicheng
 		case 14:
-			return "T-Status";
+			return "T-BOXCount";
 		case 15:
-			return "Number";
+			return "T-LMTCount";
 		case 16:
-			return "Max";
+			return "Unit";
 		case 17:
-			return "Min";
+			return "T-Status";
 		case 18:
-			return "impVol";
+			return "Max";
 		case 19:
-			return "delta";
+			return "Min";
 		case 20:
-			return "gamma";
+			return "LMT";
 		case 21:
-			return "vega";
+			return "OFFSET";
 		case 22:
-			return "theta";
+			return "ImpVol";
 		case 23:
-			return "undPrice";
+			return "Delta";
 		case 24:
-			return "optPrice";
+			return "Gamma";
 		case 25:
-			return "impVol-S";
+			return "Vega";
 		case 26:
-			return "undPrice-S";
+			return "Theta";
 		case 27:
-			return "optPrice-S";
-		case 28: 
+			return "UndPrice";
+		case 28:
+			return "OptPrice";
+		case 29:
+			return "ImpVol-S";
+		case 30:
+			return "UndPrice-S";
+		case 31:
+			return "OptPrice-S";
+		case 32: 
 			return "Start";
-		case 29: 
+		case 33: 
 			return "End";			
 		default:
 			return null;
@@ -170,46 +182,54 @@ class TopModel extends AbstractTableModel {
 		case 8:
 			return Formats.fmt0(row.m_volume);
 		case 9:
-			return row.m_tradinglimit; // jicheng
-		case 10:
-			return row.m_position;
-		case 11:
 			return fmt(row.m_avgCost); // jicheng
+		case 10:
+			return fmt(row.m_5mbar.close()); // jicheng
+		case 11:
+			return row.m_position;
 		case 12:
 			return row.m_prePosition;
 		case 13:
-			return row.m_tradingCount; // jicheng
+			return row.m_tradinglimit;
 		case 14:
-			return row.m_status.toString(); // jicheng
+			return row.m_boxTradingCounter; // jicheng
 		case 15:
-			return fmt(row.m_number); // jicheng
+			return row.m_lmtTradingCounter; // jicheng
 		case 16:
-			return fmt(row.m_max); // jicheng
+			return fmt(row.m_unit); // jicheng
 		case 17:
-			return fmt(row.m_min); // jicheng
+			return row.m_status.toString(); // jicheng
 		case 18:
-			return fmt(row.m_impVol); // jicheng
+			return fmt(row.m_max); // jicheng
 		case 19:
-			return fmt(row.m_delta); // jicheng
+			return fmt(row.m_min); // jicheng
 		case 20:
-			return fmt(row.m_gamma); // jicheng
+			return fmt(row.m_lmt); // jicheng
 		case 21:
-			return fmt(row.m_vega); // jicheng
+			return fmt(row.m_offset); // jicheng
 		case 22:
-			return fmt(row.m_theta); // jicheng
+			return fmt(row.m_impVol); // jicheng
 		case 23:
-			return fmt(row.m_undPrice); // jicheng
+			return fmt(row.m_delta); // jicheng
 		case 24:
-			return fmt(row.m_optPrice); // jicheng
+			return fmt(row.m_gamma); // jicheng
 		case 25:
-			return fmt(row.m_impVol_s); // jicheng
+			return fmt(row.m_vega); // jicheng
 		case 26:
-			return fmt(row.m_undPrice_s); // jicheng
+			return fmt(row.m_theta); // jicheng
 		case 27:
+			return fmt(row.m_undPrice); // jicheng
+		case 28:
+			return fmt(row.m_optPrice); // jicheng
+		case 29:
+			return fmt(row.m_impVol_s); // jicheng
+		case 30:
+			return fmt(row.m_undPrice_s); // jicheng
+		case 31:
 			return fmt(row.m_optPrice_s); // jicheng
-		case 28: 
+		case 32: 
 			return (new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss")).format(row.m_cal_start.getTime());				
-		case 29: 
+		case 33: 
 			return (new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss")).format(row.m_cal_end.getTime());
 		
 		default:
@@ -219,8 +239,8 @@ class TopModel extends AbstractTableModel {
 
 	@Override
 	public boolean isCellEditable(int rowSet, int col) {
-		if (col == 9 || col == 12 || col == 14 || col == 15 || col == 16  || col == 17 
-		 || col == 25 || col == 26 || col == 28 || col == 29) {
+		if (col == 12 || col == 13 || col == 16 || col == 17 || col == 18  || col == 19 
+		 || col == 20 || col == 21 || col == 29 || col == 30 || col == 32 || col == 33) {
 			return true;
 		} else {
 			return false;
@@ -233,46 +253,64 @@ class TopModel extends AbstractTableModel {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
 
 		switch (col) {
-		case 9:
-			row.m_tradinglimit = new Integer(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("trading limit: " + row.m_tradinglimit);
-			break;
 		case 12:
 			row.m_prePosition = new Integer(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("prePosition changed to: " + value.toString());
-			fireTableDataChanged();
+			ApiDemo.INSTANCE.getDemoLogger().info("PrePosition: " + row.m_tradinglimit);
 			break;
-		case 14:
-			if (value.toString().equals("None")) {
-				row.setStatus(TradingStatus.None);
-			} else if (value.toString().equals("Selling")) {
-				row.setStatus(TradingStatus.Selling);
-			} else if (value.toString().equals("sold")) {
-				row.setStatus(TradingStatus.sold);
-			} else if (value.toString().equals("buying")) {
-				row.setStatus(TradingStatus.buying);
-			} else if (value.toString().equals("bought")) {
-				row.setStatus(TradingStatus.bought);
-			}
-			ApiDemo.INSTANCE.getDemoLogger().info("status changed to: " + value.toString());
-			fireTableDataChanged();
-			break;
-		case 15:
-			row.m_number = new Double(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("trading unit: " + value.toString());
+		case 13:
+			row.m_tradinglimit = new Integer(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("m_tradinglimit: " + value.toString());
 			fireTableDataChanged();
 			break;
 		case 16:
-			row.m_max = new Double(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("Max value: " + value.toString());
-			fireTableDataChanged();
+			if ( (row.getPosition() + (new Integer(value.toString()))) <= 1 ) {
+				row.m_unit = new Integer(value.toString());
+				ApiDemo.INSTANCE.getDemoLogger().info("trading unit: " + value.toString());
+				fireTableDataChanged();
+			} else {
+				ApiDemo.INSTANCE.getDemoLogger().info("trading unit larger than short position ");
+			}
 			break;
 		case 17:
-			row.m_min = new Double(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("Min value: " + value.toString());
+			if (value.toString().equals("Init")) {
+				row.setStatus(TradingStatus.Init);
+			} else if (value.toString().equals("Selling")) {
+				row.setStatus(TradingStatus.Selling);
+			} else if (value.toString().equals("S_M")) {
+				row.setStatus(TradingStatus.S_M);
+			} else if (value.toString().equals("Buying")) {
+				row.setStatus(TradingStatus.Buying);
+			} else if (value.toString().equals("B_M")) {
+				row.setStatus(TradingStatus.B_M);
+			} else if (value.toString().equals("B_L_O")) {
+				row.setStatus(TradingStatus.B_L_O);
+			} else if (value.toString().equals("B_L")) {
+				row.setStatus(TradingStatus.B_L);
+			}
+			ApiDemo.INSTANCE.getDemoLogger().info("status: " + value.toString());
 			fireTableDataChanged();
 			break;
-		case 25:
+		case 18:
+			row.m_max = new Double(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("Max: " + value.toString());
+			fireTableDataChanged();
+			break;
+		case 19:
+			row.m_min = new Double(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("Min: " + value.toString());
+			fireTableDataChanged();
+			break;
+		case 20:
+			row.m_lmt = new Double(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + value.toString());
+			fireTableDataChanged();
+			break;
+		case 21:
+			row.m_offset = new Double(value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("offset: " + value.toString());
+			fireTableDataChanged();
+			break;
+		case 29:
 			row.m_impVol_s = new Double(value.toString());
 			if ( row.m_impVol_s > 0 ) {
 				ApiDemo.INSTANCE.controller().cancelOptionComp(row);
@@ -281,7 +319,7 @@ class TopModel extends AbstractTableModel {
 			}
 			fireTableDataChanged();
 			break;
-		case 26:
+		case 30:
 			row.m_undPrice_s = new Double(value.toString());
 			if ( row.m_undPrice_s > 0) { 
 				ApiDemo.INSTANCE.controller().cancelOptionComp(row);
@@ -290,7 +328,7 @@ class TopModel extends AbstractTableModel {
 			}
 			fireTableDataChanged();
 			break;
-		case 28:
+		case 32:
 			try {
 				row.m_cal_start.setTime(sdf.parse(value.toString()));
 			} catch (ParseException e) {
@@ -299,7 +337,7 @@ class TopModel extends AbstractTableModel {
 			}
 			ApiDemo.INSTANCE.getDemoLogger().info("start: " + value.toString());
 			break;
-		case 29:
+		case 33:
 			try {
 				row.m_cal_end.setTime(sdf.parse(value.toString()));
 			} catch (ParseException e) {
@@ -323,7 +361,7 @@ class TopModel extends AbstractTableModel {
 		ApiDemo.INSTANCE.controller().cancelTopMktData(m_rows.get(i));
 	}
 
-	static class TopRow extends TopMktDataAdapter implements IOptHandler {
+	static class TopRow extends TopMktDataAdapter implements IOptHandler, IRealTimeBarHandler {
 		AbstractTableModel m_model;
 		String m_description;
 		double m_bid;
@@ -336,7 +374,7 @@ class TopModel extends AbstractTableModel {
 		int m_volume;
 		boolean m_frozen;
 		int m_tradinglimit;
-		double m_number; // jicheng
+		double m_unit; // jicheng
 		double m_max; // jicheng
 		double m_min; // jicheng
 		NewContract m_contract;
@@ -344,7 +382,8 @@ class TopModel extends AbstractTableModel {
 		int m_position;
 		int m_prePosition;
 		double m_avgCost;
-		int m_tradingCount;
+		int m_boxTradingCounter;
+		int m_lmtTradingCounter;
 		TradingStatus m_status;
 		double m_impVol;
 		double m_delta;
@@ -356,6 +395,10 @@ class TopModel extends AbstractTableModel {
 		double m_impVol_s;
 		double m_undPrice_s;
 		double m_optPrice_s;
+		double m_lmt;
+		double m_offset;
+		int    m_lastprint;
+		Bar    m_5mbar;
 		Calendar m_cal_start = Calendar.getInstance(); 
 		Calendar m_cal_end = Calendar.getInstance();
 
@@ -364,19 +407,25 @@ class TopModel extends AbstractTableModel {
 			m_model = model;
 			m_contract = contract;
 			m_description = contract.description();
-			m_number = 0; // jicheng
+			m_unit = 0; // jicheng
 			m_max = 0; // jicheng
 			m_min = 0; // jicheng
 			m_position = position;
 			m_avgCost = avgCost;
-			m_tradingCount = 0;
-			m_status = TradingStatus.None;
+			m_boxTradingCounter = 0;
+			m_lmtTradingCounter = 0;
+			m_status = TradingStatus.Init;
 			m_prePosition = 9999;
 			m_impVol = -1;
 			m_impVol_s = -1;
 			m_undPrice_s = -1;
 			m_optPrice_s = -1;
 			m_tradinglimit = 5;
+			m_lmt = 0;
+			m_offset = 0;
+			m_lastprint = 1;
+			m_5mbar = new Bar(0, 0, 0, 0, 0, 0, 0, 0);
+			
 			
 			m_cal_start.set(Calendar.DAY_OF_MONTH, m_cal_start.get(Calendar.DAY_OF_MONTH)-1);
 			m_cal_start.set(Calendar.HOUR_OF_DAY, 17);
@@ -385,9 +434,25 @@ class TopModel extends AbstractTableModel {
 				
 			m_cal_end.set(Calendar.HOUR_OF_DAY, 15);
 			m_cal_end.set(Calendar.MINUTE, 14);
-			m_cal_end.set(Calendar.SECOND , 00);
+			m_cal_end.set(Calendar.SECOND , 05);
 		}
 
+		@Override public void realtimeBar(Bar bar) {
+			m_5mbar = bar;
+		}
+
+		public Bar get5mBar () {
+			return m_5mbar;
+		}
+		
+		public void clearLastprint () {
+			m_lastprint = 0;
+		}
+		public void closingPrint () {
+			if ( m_lastprint == 1 ) {
+			 ApiDemo.INSTANCE.getDemoLogger().info("end of day:"+m_description + "bid" + m_bid + "ask" + m_ask);
+			} 
+		}
 		public  synchronized Calendar getStart() {
 			return m_cal_start;
 		}
@@ -420,12 +485,20 @@ class TopModel extends AbstractTableModel {
 			m_status = status;
 		}
 
-		public synchronized int getCount() {
-			return m_tradingCount;
+		public synchronized int getBoxTradingCounter() {
+			return m_boxTradingCounter;
 		}
 
-		public synchronized void setCount(int count) {
-			m_tradingCount = count;
+		public synchronized void setBoxTradingCounter(int number) {
+			m_boxTradingCounter = number;
+		}
+		
+		public synchronized int getlmtTradingCounter() {
+			return m_lmtTradingCounter;
+		}
+
+		public synchronized void setlmtTradingCounter(int number) {
+			m_lmtTradingCounter = number;
 		}
 
 		public double getBidPrice() {
@@ -436,9 +509,8 @@ class TopModel extends AbstractTableModel {
 			return m_ask;
 		}
 
-
-		public double getNumber() {
-			return m_number;
+		public double getUnit() {
+			return m_unit;
 		}
 
 		public double getMax() {
@@ -449,6 +521,17 @@ class TopModel extends AbstractTableModel {
 			return m_min;
 		}
 
+		public double getLmt() {
+			return m_lmt;
+		}
+
+		public void setLmt(double limit) {
+			m_lmt = limit;
+		}
+
+		public double getOffset() {
+			return m_offset;
+		}
 		public synchronized NewContract getContract() {
 			return m_contract;
 		}
