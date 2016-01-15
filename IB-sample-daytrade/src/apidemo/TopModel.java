@@ -196,7 +196,7 @@ class TopModel extends AbstractTableModel {
 		case 15:
 			return row.m_lmtTradingCounter; // jicheng
 		case 16:
-			return fmt(row.m_unit); // jicheng
+			return row.m_unit; // jicheng
 		case 17:
 			return row.m_status.toString(); // jicheng
 		case 18:
@@ -251,6 +251,8 @@ class TopModel extends AbstractTableModel {
 	public void setValueAt(Object value, int rowSet, int col) {
 		TopRow row = m_rows.get(rowSet);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+		Double tmp_double = 0.0;
+		Integer    tmp_int = 0;
 
 		switch (col) {
 		case 12:
@@ -258,16 +260,18 @@ class TopModel extends AbstractTableModel {
 			ApiDemo.INSTANCE.getDemoLogger().info("PrePosition: " + row.m_tradinglimit);
 			break;
 		case 13:
-			if ( new Integer(value.toString()) > 0) {
-				row.m_tradinglimit = new Integer(value.toString());
-				ApiDemo.INSTANCE.getDemoLogger().info("m_tradinglimit: " + value.toString());
+			tmp_int = new Integer(value.toString()); 
+			if ( tmp_int > 0) {
+				row.m_tradinglimit = tmp_int;
+				ApiDemo.INSTANCE.getDemoLogger().info("m_tradinglimit: " + tmp_int);
 				fireTableDataChanged();
 			}	
 			break;
 		case 16:
-			if ( (row.getPosition() + (new Integer(value.toString()))) <= 1 && (new Integer(value.toString()) > 0)) {
-				row.m_unit = new Integer(value.toString());
-				ApiDemo.INSTANCE.getDemoLogger().info("trading unit: " + value.toString());
+			tmp_int = new Integer(value.toString()); 
+			if ( (row.getPosition() + tmp_int) <= 1 && (tmp_int > 0)) {
+				row.m_unit = tmp_int;
+				ApiDemo.INSTANCE.getDemoLogger().info("trading unit: " + tmp_int);
 				fireTableDataChanged();
 			} else {
 				ApiDemo.INSTANCE.getDemoLogger().info("trading unit larger than short position ");
@@ -293,30 +297,34 @@ class TopModel extends AbstractTableModel {
 			fireTableDataChanged();
 			break;
 		case 18:
-			if ( (new Integer(value.toString()) > 0) && (new Integer(value.toString()) > row.m_min) && (new Integer(value.toString()) < row.m_lmt)) {
-				row.m_max = new Double(value.toString());
-				ApiDemo.INSTANCE.getDemoLogger().info("Max: " + value.toString());
+			tmp_double = new Double(value.toString()); 
+			if ( (tmp_double > 0.0) && (tmp_double > row.m_min) && (tmp_double < row.m_lmt)) {
+				row.m_max = tmp_double;
+				ApiDemo.INSTANCE.getDemoLogger().info("Max: " + tmp_double);
 				fireTableDataChanged();
 			}
 			break;
 		case 19:
-			if ( (new Integer(value.toString()) > 0) && (new Integer(value.toString()) < row.m_max)) {
-				row.m_min = new Double(value.toString());
-				ApiDemo.INSTANCE.getDemoLogger().info("Min: " + value.toString());
+			tmp_double = new Double(value.toString()); 
+			if ( (tmp_double > 0.0) && (tmp_double < row.m_max)) {
+				row.m_min = tmp_double;
+				ApiDemo.INSTANCE.getDemoLogger().info("Min: " + tmp_double);
 				fireTableDataChanged();
 			}
 			break;
 		case 20:
-			if ( (new Integer(value.toString()) > 0) && (new Integer(value.toString()) > row.m_max)) {
-				row.m_lmt = new Double(value.toString());
-				ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + value.toString());
+			tmp_double = new Double(value.toString()); 
+			if ( (tmp_double > 0.0) && (tmp_double > row.m_max)) {
+				row.m_lmt = tmp_double;
+				ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double);
 				fireTableDataChanged();
 			}
 			break;
 		case 21:
-			if ( new Integer(value.toString()) > 0) {
-				row.m_offset = new Double(value.toString());
-				ApiDemo.INSTANCE.getDemoLogger().info("offset: " + value.toString());
+			tmp_double = new Double(value.toString()); 
+			if ( tmp_double > 0.0) {
+				row.m_offset = tmp_double;
+				ApiDemo.INSTANCE.getDemoLogger().info("offset: " + tmp_double);
 				fireTableDataChanged();
 			}
 			break;
@@ -384,7 +392,7 @@ class TopModel extends AbstractTableModel {
 		int m_volume;
 		boolean m_frozen;
 		int m_tradinglimit;
-		double m_unit; // jicheng
+		int m_unit; // jicheng
 		double m_max; // jicheng
 		double m_min; // jicheng
 		NewContract m_contract;
@@ -522,7 +530,7 @@ class TopModel extends AbstractTableModel {
 			return m_ask;
 		}
 
-		public double getUnit() {
+		public int getUnit() {
 			return m_unit;
 		}
 
