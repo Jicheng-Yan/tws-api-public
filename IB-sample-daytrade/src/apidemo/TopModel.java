@@ -298,7 +298,7 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 18:
 			tmp_double = new Double(value.toString() ); 
-			if ( (tmp_double >= 0.0) && (tmp_double > row.m_min) && (tmp_double < row.m_lmt) && row.m_status == TradingStatus.Init) {
+			if ( (tmp_double >= 0.0) && (tmp_double > row.m_ask) && (tmp_double > row.m_min) && (tmp_double < row.m_lmt) && row.m_status == TradingStatus.Init) {
 				row.m_max = tmp_double;
 				ApiDemo.INSTANCE.getDemoLogger().info("Max: " + tmp_double);
 				fireTableDataChanged();
