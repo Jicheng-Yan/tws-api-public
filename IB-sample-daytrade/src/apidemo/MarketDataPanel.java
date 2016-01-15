@@ -133,7 +133,7 @@ class OrderTimerActionListener implements ActionListener {
 				continue;
 			}
 
-			if ( Calendar.getInstance().compareTo(row.getEnd()) == 0 ) {
+			if ( Calendar.getInstance().compareTo(row.getEnd()) > 0 ) {
 				row.closingPrint();
 				row.clearLastprint();
 				continue;
