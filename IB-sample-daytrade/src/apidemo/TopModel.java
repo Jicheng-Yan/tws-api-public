@@ -258,12 +258,14 @@ class TopModel extends AbstractTableModel {
 			ApiDemo.INSTANCE.getDemoLogger().info("PrePosition: " + row.m_tradinglimit);
 			break;
 		case 13:
-			row.m_tradinglimit = new Integer(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("m_tradinglimit: " + value.toString());
-			fireTableDataChanged();
+			if ( new Integer(value.toString()) > 0) {
+				row.m_tradinglimit = new Integer(value.toString());
+				ApiDemo.INSTANCE.getDemoLogger().info("m_tradinglimit: " + value.toString());
+				fireTableDataChanged();
+			}	
 			break;
 		case 16:
-			if ( (row.getPosition() + (new Integer(value.toString()))) <= 1 ) {
+			if ( (row.getPosition() + (new Integer(value.toString()))) <= 1 && (new Integer(value.toString()) > 0)) {
 				row.m_unit = new Integer(value.toString());
 				ApiDemo.INSTANCE.getDemoLogger().info("trading unit: " + value.toString());
 				fireTableDataChanged();
@@ -291,24 +293,32 @@ class TopModel extends AbstractTableModel {
 			fireTableDataChanged();
 			break;
 		case 18:
-			row.m_max = new Double(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("Max: " + value.toString());
-			fireTableDataChanged();
+			if ( (new Integer(value.toString()) > 0) && (new Integer(value.toString()) > row.m_min) && (new Integer(value.toString()) < row.m_lmt)) {
+				row.m_max = new Double(value.toString());
+				ApiDemo.INSTANCE.getDemoLogger().info("Max: " + value.toString());
+				fireTableDataChanged();
+			}
 			break;
 		case 19:
-			row.m_min = new Double(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("Min: " + value.toString());
-			fireTableDataChanged();
+			if ( (new Integer(value.toString()) > 0) && (new Integer(value.toString()) < row.m_max)) {
+				row.m_min = new Double(value.toString());
+				ApiDemo.INSTANCE.getDemoLogger().info("Min: " + value.toString());
+				fireTableDataChanged();
+			}
 			break;
 		case 20:
-			row.m_lmt = new Double(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + value.toString());
-			fireTableDataChanged();
+			if ( (new Integer(value.toString()) > 0) && (new Integer(value.toString()) > row.m_max)) {
+				row.m_lmt = new Double(value.toString());
+				ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + value.toString());
+				fireTableDataChanged();
+			}
 			break;
 		case 21:
-			row.m_offset = new Double(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("offset: " + value.toString());
-			fireTableDataChanged();
+			if ( new Integer(value.toString()) > 0) {
+				row.m_offset = new Double(value.toString());
+				ApiDemo.INSTANCE.getDemoLogger().info("offset: " + value.toString());
+				fireTableDataChanged();
+			}
 			break;
 		case 29:
 			row.m_impVol_s = new Double(value.toString());
