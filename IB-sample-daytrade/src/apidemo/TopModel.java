@@ -91,21 +91,21 @@ class TopModel extends AbstractTableModel {
 		case 1:
 			return "BidSize";
 		case 2:
-			return "Bid";
-		case 3:
-			return "Ask";
-		case 4:
 			return "AskSize";
-		case 5:
+		case 3:
 			return "Last";
-		case 6:
+		case 4:
 			return "Time";
-		case 7:
+		case 5:
 			return "Change";
-		case 8:
+		case 6:
 			return "Volume";
-		case 9:
+		case 7:
 			return "AvgCost"; // jicheng
+		case 8:
+			return "Bid";
+		case 9:
+			return "Ask";
 		case 10:
 			return "5sAvg"; // jicheng
 		case 11:
@@ -168,21 +168,21 @@ class TopModel extends AbstractTableModel {
 		case 1:
 			return row.m_bidSize;
 		case 2:
-			return fmt(row.m_bid);
-		case 3:
-			return fmt(row.m_ask);
-		case 4:
 			return row.m_askSize;
-		case 5:
+		case 3:
 			return fmt(row.m_last);
-		case 6:
+		case 4:
 			return fmtTime(row.m_lastTime);
-		case 7:
+		case 5:
 			return row.change();
-		case 8:
+		case 6:
 			return Formats.fmt0(row.m_volume);
-		case 9:
+		case 7:
 			return fmt(row.m_avgCost); // jicheng
+		case 8:
+			return fmt(row.m_bid);
+		case 9:
+			return fmt(row.m_ask);
 		case 10:
 			return fmt(row.m_5sAvg.close()); // jicheng
 		case 11:
