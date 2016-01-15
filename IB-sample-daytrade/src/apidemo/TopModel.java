@@ -261,7 +261,7 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 13:
 			tmp_int = new Integer(value.toString()); 
-			if ( tmp_int > 0) {
+			if ( tmp_int >= 0 && row.m_status == TradingStatus.Init) {
 				row.m_tradinglimit = tmp_int;
 				ApiDemo.INSTANCE.getDemoLogger().info("m_tradinglimit: " + tmp_int);
 				fireTableDataChanged();
@@ -269,7 +269,7 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 16:
 			tmp_int = new Integer(value.toString()); 
-			if ( (row.getPosition() + tmp_int) <= 1 && (tmp_int > 0)) {
+			if ( (row.getPosition() + tmp_int) <= 1 && (tmp_int >= 0) && row.m_status == TradingStatus.Init) {
 				row.m_unit = tmp_int;
 				ApiDemo.INSTANCE.getDemoLogger().info("trading unit: " + tmp_int);
 				fireTableDataChanged();
@@ -297,8 +297,8 @@ class TopModel extends AbstractTableModel {
 			fireTableDataChanged();
 			break;
 		case 18:
-			tmp_double = new Double(value.toString()); 
-			if ( (tmp_double > 0.0) && (tmp_double > row.m_min) && (tmp_double < row.m_lmt)) {
+			tmp_double = new Double(value.toString() ); 
+			if ( (tmp_double >= 0.0) && (tmp_double > row.m_min) && (tmp_double < row.m_lmt) && row.m_status == TradingStatus.Init) {
 				row.m_max = tmp_double;
 				ApiDemo.INSTANCE.getDemoLogger().info("Max: " + tmp_double);
 				fireTableDataChanged();
@@ -306,7 +306,7 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 19:
 			tmp_double = new Double(value.toString()); 
-			if ( (tmp_double > 0.0) && (tmp_double < row.m_max)) {
+			if ( (tmp_double >= 0.0) && (tmp_double < row.m_max) && row.m_status == TradingStatus.Init) {
 				row.m_min = tmp_double;
 				ApiDemo.INSTANCE.getDemoLogger().info("Min: " + tmp_double);
 				fireTableDataChanged();
@@ -314,7 +314,7 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 20:
 			tmp_double = new Double(value.toString()); 
-			if ( (tmp_double > 0.0) && (tmp_double > row.m_max)) {
+			if ( (tmp_double >= 0.0) && (tmp_double > row.m_max) && row.m_status == TradingStatus.Init) {
 				row.m_lmt = tmp_double;
 				ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double);
 				fireTableDataChanged();
@@ -322,7 +322,7 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 21:
 			tmp_double = new Double(value.toString()); 
-			if ( tmp_double > 0.0) {
+			if ( tmp_double >= 0.0 && row.m_status == TradingStatus.Init) {
 				row.m_offset = tmp_double;
 				ApiDemo.INSTANCE.getDemoLogger().info("offset: " + tmp_double);
 				fireTableDataChanged();
