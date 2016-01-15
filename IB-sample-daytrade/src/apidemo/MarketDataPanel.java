@@ -192,12 +192,24 @@ class OrderTimerActionListener implements ActionListener {
 					
 					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
 						@Override public void orderState(NewOrderState orderState) {
-							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
-						    System.out.println("order placed");						
+							ApiDemo.INSTANCE.getDemoLogger().info("order placed");						
 						}
 						@Override public void orderStatus(OrderStatus status, int filled, int remaining, double avgFillPrice, long permId, int parentId, double lastFillPrice, int clientId, String whyHeld) {
+							if ( status == OrderStatus.Cancelled) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order cancelled");						
+								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							} else if ( status == OrderStatus.Submitted) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order submitted");						
+							} else if ( status == OrderStatus.Filled && remaining == 0) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order filled @avgPrice: " + avgFillPrice);						
+								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							} else  {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order hold: " + whyHeld);	
+							}
 						}
 						@Override public void handle(int errorCode, final String errorMsg) {
+							ApiDemo.INSTANCE.getDemoLogger().info("Order code and message: " + errorCode +  " " + errorMsg);						
+							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						}
 					});
 
@@ -237,12 +249,24 @@ class OrderTimerActionListener implements ActionListener {
 
 					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
 						@Override public void orderState(NewOrderState orderState) {
-							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
-						    System.out.println("order placed");						
+							ApiDemo.INSTANCE.getDemoLogger().info("order placed");						
 						}
 						@Override public void orderStatus(OrderStatus status, int filled, int remaining, double avgFillPrice, long permId, int parentId, double lastFillPrice, int clientId, String whyHeld) {
+							if ( status == OrderStatus.Cancelled) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order cancelled");						
+								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							} else if ( status == OrderStatus.Submitted) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order submitted");						
+							} else if ( status == OrderStatus.Filled && remaining == 0) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order filled @avgPrice: " + avgFillPrice);						
+								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							} else  {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order hold: " + whyHeld);	
+							}
 						}
 						@Override public void handle(int errorCode, final String errorMsg) {
+							ApiDemo.INSTANCE.getDemoLogger().info("Order code and message: " + errorCode +  " " + errorMsg);						
+							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						}
 					});
 				} else if ( row.getLmt() < row.get5sAvg().close()) {
@@ -264,16 +288,28 @@ class OrderTimerActionListener implements ActionListener {
 					order.totalQuantity( Math.abs(row.getPosition()));
 					row.getContract().exchange("GLOBEX");
 
-					ApiDemo.INSTANCE.controller().placeOrModifyOrder( row.getContract(), order, new IOrderHandler() {
+					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
 						@Override public void orderState(NewOrderState orderState) {
-						ApiDemo.INSTANCE.controller().removeOrderHandler( this);
-						    System.out.println("order placed");						
+							ApiDemo.INSTANCE.getDemoLogger().info("order placed");						
 						}
 						@Override public void orderStatus(OrderStatus status, int filled, int remaining, double avgFillPrice, long permId, int parentId, double lastFillPrice, int clientId, String whyHeld) {
+							if ( status == OrderStatus.Cancelled) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order cancelled");						
+								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							} else if ( status == OrderStatus.Submitted) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order submitted");						
+							} else if ( status == OrderStatus.Filled && remaining == 0) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order filled @avgPrice: " + avgFillPrice);						
+								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							} else  {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order hold: " + whyHeld);	
+							}
 						}
 						@Override public void handle(int errorCode, final String errorMsg) {
+							ApiDemo.INSTANCE.getDemoLogger().info("Order code and message: " + errorCode +  " " + errorMsg);						
+							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						}
-					});					
+					});
 				}
 			} else if (row.getStatus() == TradingStatus.Buying) {
 				if (  (row.getPosition() == 0 ) && (row.get5sAvg().close() >= row.getLmt())) {
@@ -311,15 +347,26 @@ class OrderTimerActionListener implements ActionListener {
 					
 					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
 						@Override public void orderState(NewOrderState orderState) {
-							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
-						    System.out.println("order placed");						
+							ApiDemo.INSTANCE.getDemoLogger().info("order placed");						
 						}
 						@Override public void orderStatus(OrderStatus status, int filled, int remaining, double avgFillPrice, long permId, int parentId, double lastFillPrice, int clientId, String whyHeld) {
+							if ( status == OrderStatus.Cancelled) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order cancelled");						
+								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							} else if ( status == OrderStatus.Submitted) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order submitted");						
+							} else if ( status == OrderStatus.Filled && remaining == 0) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order filled @avgPrice: " + avgFillPrice);						
+								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							} else  {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order hold: " + whyHeld);	
+							}
 						}
 						@Override public void handle(int errorCode, final String errorMsg) {
+							ApiDemo.INSTANCE.getDemoLogger().info("Order code and message: " + errorCode +  " " + errorMsg);						
+							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						}
 					});
-
 				}
 			
 			} else if (row.getStatus() == TradingStatus.B_L_O) {
@@ -341,14 +388,26 @@ class OrderTimerActionListener implements ActionListener {
 					row.setPrePosition(0);
 					row.getContract().exchange("GLOBEX");
 
-					ApiDemo.INSTANCE.controller().placeOrModifyOrder( row.getContract(), order, new IOrderHandler() {
+					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
 						@Override public void orderState(NewOrderState orderState) {
-							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
-						    System.out.println("order placed");						
+							ApiDemo.INSTANCE.getDemoLogger().info("order placed");						
 						}
 						@Override public void orderStatus(OrderStatus status, int filled, int remaining, double avgFillPrice, long permId, int parentId, double lastFillPrice, int clientId, String whyHeld) {
+							if ( status == OrderStatus.Cancelled) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order cancelled");						
+								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							} else if ( status == OrderStatus.Submitted) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order submitted");						
+							} else if ( status == OrderStatus.Filled && remaining == 0) {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order filled @avgPrice: " + avgFillPrice);						
+								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							} else  {
+								ApiDemo.INSTANCE.getDemoLogger().info("Order hold: " + whyHeld);	
+							}
 						}
 						@Override public void handle(int errorCode, final String errorMsg) {
+							ApiDemo.INSTANCE.getDemoLogger().info("Order code and message: " + errorCode +  " " + errorMsg);						
+							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						}
 					});
 				}				
