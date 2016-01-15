@@ -113,11 +113,11 @@ class TopModel extends AbstractTableModel {
 		case 12:
 			return "PrePosition"; // jicheng
 		case 13:
-			return "BOX#Limit"; // jicheng
+			return "BOXCount";
 		case 14:
-			return "T-BOXCount";
+			return "LMTCount";
 		case 15:
-			return "T-LMTCount";
+			return "BOXLimit"; // jicheng
 		case 16:
 			return "Unit";
 		case 17:
@@ -190,11 +190,11 @@ class TopModel extends AbstractTableModel {
 		case 12:
 			return row.m_prePosition;
 		case 13:
-			return row.m_tradinglimit;
-		case 14:
 			return row.m_boxTradingCounter; // jicheng
-		case 15:
+		case 14:
 			return row.m_lmtTradingCounter; // jicheng
+		case 15:
+			return row.m_tradinglimit;
 		case 16:
 			return row.m_unit; // jicheng
 		case 17:
@@ -239,7 +239,7 @@ class TopModel extends AbstractTableModel {
 
 	@Override
 	public boolean isCellEditable(int rowSet, int col) {
-		if (col == 12 || col == 13 || col == 16 || col == 17 || col == 18  || col == 19 
+		if (col == 12 || col == 15 || col == 16 || col == 17 || col == 18  || col == 19 
 		 || col == 20 || col == 21 || col == 29 || col == 30 || col == 32 || col == 33) {
 			return true;
 		} else {
@@ -259,7 +259,7 @@ class TopModel extends AbstractTableModel {
 			row.m_prePosition = new Integer(value.toString());
 			ApiDemo.INSTANCE.getDemoLogger().info("PrePosition: " + row.m_tradinglimit);
 			break;
-		case 13:
+		case 15:
 			tmp_int = new Integer(value.toString()); 
 			if ( tmp_int >= 0 && row.m_status == TradingStatus.Init) {
 				row.m_tradinglimit = tmp_int;
