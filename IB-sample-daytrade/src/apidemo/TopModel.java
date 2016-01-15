@@ -279,6 +279,16 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 17:
 			if (value.toString().equals("Init")) {
+				row.m_unit = 0; 
+				row.m_max = 0; 
+				row.m_min = 0; 
+				row.m_boxTradingCounter = 0;
+				row.m_lmtTradingCounter = 0;
+				row.m_prePosition = 9999;
+				row.m_tradinglimit = 5;
+				row.m_lmt = 0;
+				row.m_offset = 0;
+
 				row.setStatus(TradingStatus.Init);
 			} else if (value.toString().equals("Selling")) {
 				row.setStatus(TradingStatus.Selling);
