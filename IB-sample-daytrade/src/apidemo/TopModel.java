@@ -107,7 +107,7 @@ class TopModel extends AbstractTableModel {
 		case 9:
 			return "AvgCost"; // jicheng
 		case 10:
-			return "5mBar"; // jicheng
+			return "5sAvg"; // jicheng
 		case 11:
 			return "Position";
 		case 12:
@@ -184,7 +184,7 @@ class TopModel extends AbstractTableModel {
 		case 9:
 			return fmt(row.m_avgCost); // jicheng
 		case 10:
-			return fmt(row.m_5mbar.close()); // jicheng
+			return fmt(row.m_5sAvg.wap()); // jicheng
 		case 11:
 			return row.m_position;
 		case 12:
@@ -398,7 +398,7 @@ class TopModel extends AbstractTableModel {
 		double m_lmt;
 		double m_offset;
 		int    m_lastprint;
-		Bar    m_5mbar;
+		Bar    m_5sAvg;
 		Calendar m_cal_start = Calendar.getInstance(); 
 		Calendar m_cal_end = Calendar.getInstance();
 
@@ -424,7 +424,7 @@ class TopModel extends AbstractTableModel {
 			m_lmt = 0;
 			m_offset = 0;
 			m_lastprint = 1;
-			m_5mbar = new Bar(0, 0, 0, 0, 0, 0, 0, 0);
+			m_5sAvg = new Bar(0, 0, 0, 0, 0, 0, 0, 0);
 			
 			
 			m_cal_start.set(Calendar.DAY_OF_MONTH, m_cal_start.get(Calendar.DAY_OF_MONTH)-1);
@@ -438,11 +438,11 @@ class TopModel extends AbstractTableModel {
 		}
 
 		@Override public void realtimeBar(Bar bar) {
-			m_5mbar = bar;
+			m_5sAvg = bar;
 		}
 
-		public Bar get5mBar () {
-			return m_5mbar;
+		public Bar get5sAvg () {
+			return m_5sAvg;
 		}
 		
 		public void clearLastprint () {
