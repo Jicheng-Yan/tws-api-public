@@ -184,7 +184,7 @@ class TopModel extends AbstractTableModel {
 		case 9:
 			return fmt(row.m_avgCost); // jicheng
 		case 10:
-			return fmt(row.m_5sAvg.wap()); // jicheng
+			return fmt(row.m_5sAvg.close()); // jicheng
 		case 11:
 			return row.m_position;
 		case 12:
