@@ -450,7 +450,10 @@ class TopModel extends AbstractTableModel {
 		}
 		public void closingPrint () {
 			if ( m_lastprint == 1 ) {
-			 ApiDemo.INSTANCE.getDemoLogger().info("end of day:"+m_description + "bid" + m_bid + "ask" + m_ask);
+				ApiDemo.INSTANCE.getDemoLogger().info("EoD Record: "+m_description + "-bid:" + m_bid + "-ask:" + m_ask + "-5s:" + m_5sAvg.close());
+				ApiDemo.INSTANCE.getDemoLogger().info("-Position:"+m_position + "-PrePosition:" + m_prePosition + "-tradingLimit:" + m_tradinglimit + "-boxTradingCounter:" + m_boxTradingCounter);
+				ApiDemo.INSTANCE.getDemoLogger().info("-lmtTradingCounter:"+m_lmtTradingCounter + "-Unit:" + m_unit + "-status:" + m_status.toString());
+				ApiDemo.INSTANCE.getDemoLogger().info("-Max:"+m_max + "-Min:" + m_min + "-Limit:" + m_lmt + "-Offset:" + m_offset);
 			} 
 		}
 		public  synchronized Calendar getStart() {
