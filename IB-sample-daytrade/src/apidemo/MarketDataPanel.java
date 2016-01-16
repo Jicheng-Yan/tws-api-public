@@ -128,10 +128,6 @@ class OrderTimerActionListener implements ActionListener {
 			if (row.getPosition()> 0) {
 				continue;
 			}
-				
-			if ( row.getBoxTradingCounter() >= row.getTradinglimit()) { 
-				continue;
-			}
 
 			if ( Calendar.getInstance().compareTo(row.getEnd()) > 0 ) {
 				row.closingPrint();
@@ -150,22 +146,22 @@ class OrderTimerActionListener implements ActionListener {
 			}
 			
 			if ( row.getAskPrice() <= 0 || row.getBidPrice() <= 0 ) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("bid or ask is not normal - bid: " + row.getContract().description() + row.getBidPrice() + " ask: " + row.getAskPrice());
+				ApiDemo.INSTANCE.getDemoLogger().info("bid or ask is not normal - bid: " + row.getContract().description() + row.getBidPrice() + " ask: " + row.getAskPrice());
 				continue;
 			}
 			
 			if ( (row.getAskPrice() - row.getBidPrice())/row.getAskPrice() >= 0.2) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("too big difference bid/ask - bid: " + row.getContract().description() + row.getBidPrice() + " ask: " + row.getAskPrice());
+				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask - bid: " + row.getContract().description() + row.getBidPrice() + " ask: " + row.getAskPrice());
 				continue;
 			}
 
 			if ( row.get5sAvg().close() <= 0 ) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("5sec average is below zero" +  row.get5sAvg().close());
+				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is below zero" +  row.get5sAvg().close());
 				continue;
 			}
 
 			if ( (Math.abs(row.get5sAvg().close() -  (row.getBidPrice() + row.getAskPrice())/2) > 5)) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("5sec average is too far from midprice");
+				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is too far from midprice");
 				continue;
 			}
 
@@ -174,6 +170,9 @@ class OrderTimerActionListener implements ActionListener {
 					;
 				} else if ( row.getMax() <= row.getBidPrice()) { //sell
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
+					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
+						continue;
+					}
 					row.setStatus(TradingStatus.Selling);
 					row.setPrePosition( row.getPosition());
 					ApiDemo.INSTANCE.getDemoLogger().info("status changed: Init -> Selling ");
@@ -231,6 +230,9 @@ class OrderTimerActionListener implements ActionListener {
 					;
 				} else if ( row.getMin() >= row.getAskPrice()) { //buy
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
+					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
+						continue;
+					}
 					row.setStatus(TradingStatus.Buying);
 					row.setPrePosition( row.getPosition());
 					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from S_M -> buying ");					
@@ -271,6 +273,9 @@ class OrderTimerActionListener implements ActionListener {
 					});
 				} else if ( row.getLmt() < row.get5sAvg().close()) {
 					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
+					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
+						continue;
+					}
 					row.setStatus(TradingStatus.Buying);
 					ApiDemo.INSTANCE.getDemoLogger().info("status change: S_M->Buying");
 
@@ -329,6 +334,9 @@ class OrderTimerActionListener implements ActionListener {
 					;
 				} else if ( row.getMax() <= row.getBidPrice()) { //sell
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
+					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
+						continue;
+					}
 					row.setStatus(TradingStatus.Selling);
 					row.setPrePosition( row.getPosition());
 					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from B_M -> Selling ");
@@ -372,6 +380,9 @@ class OrderTimerActionListener implements ActionListener {
 			} else if (row.getStatus() == TradingStatus.B_L_O) {
 				if (row.getLmt() + row.getOffset() > row.get5sAvg().close()) { //sell
 					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
+					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
+						continue;
+					}
 					row.setStatus(TradingStatus.Selling);
 					ApiDemo.INSTANCE.getDemoLogger().info("status change: B_L_O->Selling");
 					
