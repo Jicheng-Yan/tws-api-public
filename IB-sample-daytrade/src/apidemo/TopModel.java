@@ -80,7 +80,7 @@ class TopModel extends AbstractTableModel {
 
 	@Override
 	public int getColumnCount() {
-		return 34;
+		return 35;
 	}
 
 	@Override

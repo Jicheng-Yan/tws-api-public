@@ -6,7 +6,7 @@ package apidemo;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.awt.event.KeyEvent;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -151,7 +152,7 @@ class OrderTimerActionListener implements ActionListener {
 			}
 			
 			if ( (row.getAskPrice() - row.getBidPrice())/row.getAskPrice() >= 0.2) {
-				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask - bid: " + row.getContract().description() + row.getBidPrice() + " ask: " + row.getAskPrice());
+				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask:" + row.getContract().description() + " bid: " + row.getBidPrice() + " ask: " + row.getAskPrice());
 				continue;
 			}
 
@@ -169,10 +170,10 @@ class OrderTimerActionListener implements ActionListener {
 				if ( row.getMax() <= 0 || row.getBidPrice() <= 0 || row.getPosition() > 0) {
 					;
 				} else if ( row.getMax() <= row.getBidPrice()) { //sell
-					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
 						continue;
 					}
+					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
 					row.setStatus(TradingStatus.Selling);
 					row.setPrePosition( row.getPosition());
 					ApiDemo.INSTANCE.getDemoLogger().info("status changed: Init -> Selling ");
@@ -208,7 +209,7 @@ class OrderTimerActionListener implements ActionListener {
 						}
 						@Override public void handle(int errorCode, final String errorMsg) {
 							ApiDemo.INSTANCE.getDemoLogger().info("Order code and message: " + errorCode +  " " + errorMsg);						
-							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							//ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						}
 					});
 
@@ -229,10 +230,10 @@ class OrderTimerActionListener implements ActionListener {
 				if ( row.getMin() <= 0 ||  row.getAskPrice() <= 0 || row.getPosition() >= 0) {
 					;
 				} else if ( row.getMin() >= row.getAskPrice()) { //buy
-					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
 						continue;
 					}
+					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
 					row.setStatus(TradingStatus.Buying);
 					row.setPrePosition( row.getPosition());
 					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from S_M -> buying ");					
@@ -268,20 +269,20 @@ class OrderTimerActionListener implements ActionListener {
 						}
 						@Override public void handle(int errorCode, final String errorMsg) {
 							ApiDemo.INSTANCE.getDemoLogger().info("Order code and message: " + errorCode +  " " + errorMsg);						
-							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							//ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						}
 					});
 				} else if ( row.getLmt() < row.get5sAvg().close()) {
-					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
 						continue;
 					}
+					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
 					row.setStatus(TradingStatus.Buying);
 					ApiDemo.INSTANCE.getDemoLogger().info("status change: S_M->Buying");
 
 					row.setPrePosition( row.getPosition());
 					
-					ApiDemo.INSTANCE.getDemoLogger().info("buy "+ row.getContract().description() + " " + Math.abs(row.getPosition()) + "mid: " + row.get5sAvg().close());
+					ApiDemo.INSTANCE.getDemoLogger().info("buy "+ row.getContract().description() + " " + Math.abs(row.getPosition()) + " mid: " + row.get5sAvg().close());
 					NewOrder order = new NewOrder();
 					order.orderType( OrderType.MKT);
 					//order.lmtPrice( 150);
@@ -312,7 +313,7 @@ class OrderTimerActionListener implements ActionListener {
 						}
 						@Override public void handle(int errorCode, final String errorMsg) {
 							ApiDemo.INSTANCE.getDemoLogger().info("Order code and message: " + errorCode +  " " + errorMsg);						
-							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							//ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						}
 					});
 				}
@@ -333,10 +334,10 @@ class OrderTimerActionListener implements ActionListener {
 				if ( row.getMax() <= 0 || row.getBidPrice() <= 0 || row.getPosition() > 0) {
 					;
 				} else if ( row.getMax() <= row.getBidPrice()) { //sell
-					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
 						continue;
 					}
+					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
 					row.setStatus(TradingStatus.Selling);
 					row.setPrePosition( row.getPosition());
 					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from B_M -> Selling ");
@@ -372,21 +373,21 @@ class OrderTimerActionListener implements ActionListener {
 						}
 						@Override public void handle(int errorCode, final String errorMsg) {
 							ApiDemo.INSTANCE.getDemoLogger().info("Order code and message: " + errorCode +  " " + errorMsg);						
-							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							//ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						}
 					});
 				}
 			
 			} else if (row.getStatus() == TradingStatus.B_L_O) {
 				if (row.getLmt() + row.getOffset() > row.get5sAvg().close()) { //sell
-					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
 						continue;
 					}
+					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
 					row.setStatus(TradingStatus.Selling);
 					ApiDemo.INSTANCE.getDemoLogger().info("status change: B_L_O->Selling");
 					
-					ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getPrePosition())   + "mid: " + row.get5sAvg().close());
+					ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getPrePosition())   + " mid: " + row.get5sAvg().close());
 					NewOrder order = new NewOrder();
 					order.orderType( OrderType.MKT);
 					//order.lmtPrice( 150);
@@ -396,7 +397,7 @@ class OrderTimerActionListener implements ActionListener {
 					order.action(Action.SELL);
 					order.outsideRth(true);
 					order.totalQuantity( (int)Math.abs(row.getPrePosition()));
-					row.setPrePosition(0);
+					row.setPrePosition(row.getPrePosition() + row.getUnit());
 					row.getContract().exchange("GLOBEX");
 
 					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
@@ -418,7 +419,7 @@ class OrderTimerActionListener implements ActionListener {
 						}
 						@Override public void handle(int errorCode, final String errorMsg) {
 							ApiDemo.INSTANCE.getDemoLogger().info("Order code and message: " + errorCode +  " " + errorMsg);						
-							ApiDemo.INSTANCE.controller().removeOrderHandler( this);
+							//ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						}
 					});
 				}				
@@ -515,6 +516,11 @@ public class MarketDataPanel extends JPanel {
 		TopResultsPanel() {
 			m_typeCombo.removeItemAt( 0);
 
+			m_tab.setRowSelectionAllowed(true); //jicheng
+	        //KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+	        //m_tab.getActionMap().put("delete", deleteAction());
+	        //m_tab.getInputMap(JComponent.WHEN_FOCUSED).put(keyStroke, "delete");
+
 			JScrollPane scroll = new JScrollPane( m_tab);
 
 			HtmlButton reqType = new HtmlButton( "Go") {
@@ -530,7 +536,8 @@ public class MarketDataPanel extends JPanel {
 			add( scroll);
 			add( butPanel, BorderLayout.SOUTH);
 		}
-		
+
+
 		/** Called when the tab is first visited. */
 		@Override public void activated() {
 		}
