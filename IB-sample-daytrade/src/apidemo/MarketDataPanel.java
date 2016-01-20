@@ -172,7 +172,7 @@ class OrderTimerActionListener implements ActionListener {
 					;
 				} else if ( row.getMax() <= row.getBidPrice()) { //sell
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
-						ApiDemo.INSTANCE.getDemoLogger().fine("getBoxTradingCounter is larger than limit");
+						ApiDemo.INSTANCE.getDemoLogger().info("getBoxTradingCounter is larger than limit");
 						continue;
 					}
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
@@ -233,6 +233,7 @@ class OrderTimerActionListener implements ActionListener {
 					;
 				} else if ( row.getMin() >= row.getAskPrice()) { //buy
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
+						ApiDemo.INSTANCE.getDemoLogger().info("getBoxTradingCounter is larger than limit");
 						continue;
 					}
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
@@ -276,6 +277,7 @@ class OrderTimerActionListener implements ActionListener {
 					});
 				} else if ( row.getLmt() < row.get5sAvg().close()) {
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
+						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit");
 						continue;
 					}
 					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
@@ -337,6 +339,7 @@ class OrderTimerActionListener implements ActionListener {
 					;
 				} else if ( row.getMax() <= row.getBidPrice()) { //sell
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
+						ApiDemo.INSTANCE.getDemoLogger().info("BoxTradingCounter is larger than limit");
 						continue;
 					}
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
@@ -383,6 +386,7 @@ class OrderTimerActionListener implements ActionListener {
 			} else if (row.getStatus() == TradingStatus.B_L_O) {
 				if (row.getLmt() + row.getOffset() > row.get5sAvg().close()) { //sell
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
+						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit");
 						continue;
 					}
 					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
