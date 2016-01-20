@@ -425,6 +425,7 @@ class TopModel extends AbstractTableModel {
 		case 34:
 			try {
 				row.m_cal_end.setTime(sdf.parse(value.toString()));
+				row.m_lastprint = 1;
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
