@@ -127,6 +127,7 @@ class OrderTimerActionListener implements ActionListener {
 		while (itr.hasNext()) {
 			TopRow row = itr.next();
 			if (row.getPosition()> 0) {
+				ApiDemo.INSTANCE.getDemoLogger().info("Position size is larger than 0");
 				continue;
 			}
 
@@ -137,12 +138,12 @@ class OrderTimerActionListener implements ActionListener {
 			}
 
 			if ( Calendar.getInstance().before(row.getStart())) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("trading session not started, before: "+ dateFormat.format(row.getStart().getTime()));
+				ApiDemo.INSTANCE.getDemoLogger().info("trading session not started, before: "+ dateFormat.format(row.getStart().getTime()));
 				continue;
 			}
 
 			if ( Calendar.getInstance().after(row.getEnd())) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("trading session has finished, after: "+ dateFormat.format(row.getEnd().getTime()));
+				ApiDemo.INSTANCE.getDemoLogger().info("trading session has finished, after: "+ dateFormat.format(row.getEnd().getTime()));
 				continue;
 			}
 			
@@ -171,6 +172,7 @@ class OrderTimerActionListener implements ActionListener {
 					;
 				} else if ( row.getMax() <= row.getBidPrice()) { //sell
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
+						ApiDemo.INSTANCE.getDemoLogger().fine("getBoxTradingCounter is larger than limit");
 						continue;
 					}
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
