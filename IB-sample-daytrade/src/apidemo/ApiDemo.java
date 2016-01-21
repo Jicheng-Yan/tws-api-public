@@ -296,6 +296,7 @@ public class ApiDemo implements IConnectionHandler {
 			HtmlButton disconnect = new HtmlButton("Disconnect") {
 				@Override
 				public void actionPerformed() {
+					m_controller.cancelPositions(ApiDemo.INSTANCE.m_mktDataPanel.getCallback());
 					m_controller.disconnect();
 				}
 			};

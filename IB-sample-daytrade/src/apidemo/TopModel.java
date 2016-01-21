@@ -303,9 +303,10 @@ class TopModel extends AbstractTableModel {
 				row.m_offset = 0;
 				
 				row.setStatus(TradingStatus.Init);
-			} /*else if (value.toString().equals("Selling")) {
-				row.setStatus(TradingStatus.Selling);
-			} */else if (value.toString().equals("S_M")) {
+			} else if (value.toString().equals("Stop")) {
+				ApiDemo.INSTANCE.controller().cancelOptionMktData(row);
+				ApiDemo.INSTANCE.getDemoLogger().info("stop market data flow");
+			} else if (value.toString().equals("S_M")) {
 				row.setStatus(TradingStatus.S_M);
 			} /*else if (value.toString().equals("Buying")) {
 				row.setStatus(TradingStatus.Buying);
