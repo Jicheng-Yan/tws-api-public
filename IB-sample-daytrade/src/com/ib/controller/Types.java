@@ -201,7 +201,7 @@ public class Types {
 	}
 
 	public static enum  TradingStatus {
-		Init,  Selling, S_M, Buying, B_M, B_L_O, B_L;
+		Init,  Selling, S_M, Buying, B_M, B_L_O, B_L, Stop;
 		
 		public String getApiString() {
 			return super.toString();
@@ -216,6 +216,7 @@ public class Types {
 				case B_M: 		return "B_M";
 				case B_L_O:		return "B_L_O";
 				case B_L:		return "B_L";
+				case Stop:		return "Stop";
 				default:		return null;
 			}
 		}

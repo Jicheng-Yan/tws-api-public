@@ -290,7 +290,7 @@ class TopModel extends AbstractTableModel {
 			}
 			break;
 		case 18:
-			if (value.toString().equals("Init")) {
+			if (value.toString().equals("init")) {
 				row.m_unit = 0; 
 				row.m_max = 0; 
 				row.m_min = 0; 
@@ -302,19 +302,25 @@ class TopModel extends AbstractTableModel {
 				row.m_lmt = 0;
 				row.m_offset = 0;
 				
+				if ( row.m_status==TradingStatus.Stop) {
+					ApiDemo.INSTANCE.controller().reqOptionMktData(row.getContract(), "", false, row);
+					ApiDemo.INSTANCE.getDemoLogger().info("stop market data flow");
+				}
+				
 				row.setStatus(TradingStatus.Init);
-			} else if (value.toString().equals("Stop")) {
+			} else if (value.toString().equals("stop")) {
+				row.setStatus(TradingStatus.Stop);
 				ApiDemo.INSTANCE.controller().cancelOptionMktData(row);
 				ApiDemo.INSTANCE.getDemoLogger().info("stop market data flow");
-			} else if (value.toString().equals("S_M")) {
+			} else if (value.toString().equals("sm")) {
 				row.setStatus(TradingStatus.S_M);
 			} /*else if (value.toString().equals("Buying")) {
 				row.setStatus(TradingStatus.Buying);
-			} */else if (value.toString().equals("B_M")) {
+			} */else if (value.toString().equals("bm")) {
 				row.setStatus(TradingStatus.B_M);
-			} else if (value.toString().equals("B_L_O")) {
+			} else if (value.toString().equals("blo")) {
 				row.setStatus(TradingStatus.B_L_O);
-			} else if (value.toString().equals("B_L")) {
+			} else if (value.toString().equals("bl")) {
 				row.setStatus(TradingStatus.B_L);
 			}
 			ApiDemo.INSTANCE.getDemoLogger().info("status: " + value.toString());

@@ -126,8 +126,8 @@ class OrderTimerActionListener implements ActionListener {
 		Iterator<TopRow> itr = contractlist.iterator();
 		while (itr.hasNext()) {
 			TopRow row = itr.next();
-			if (row.getPosition()> 0) {
-				ApiDemo.INSTANCE.getDemoLogger().info("Position size is larger than 0");
+			if (row.getPosition()> 0 || row.getStatus() == TradingStatus.Stop) {
+				ApiDemo.INSTANCE.getDemoLogger().info("Position size is larger than 0 or in Stop status");
 				continue;
 			}
 
@@ -216,7 +216,7 @@ class OrderTimerActionListener implements ActionListener {
 			} else if (row.getStatus() == TradingStatus.Selling) {
 				if (row.getPosition() == row.getPrePosition() && ( row.getLmt() + row.getOffset()- row.get5sAvg().close() < row.get5sAvg().close() - row.getMax())) {
 					row.setStatus(TradingStatus.S_M);
-					row.setLmt( row.getLmt() + row.getOffset());
+					row.setLmt( row.getLmt() + row.getOffset()*4);
 					ApiDemo.INSTANCE.getDemoLogger().info("status change: Selling->Sold");
 					ApiDemo.INSTANCE.getDemoLogger().info("stop price changed to: " + row.getLmt());
 				} else if ( Math.abs(row.getPosition()) == Math.abs(row.getPrePosition()) + row.getUnit()
