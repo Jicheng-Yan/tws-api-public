@@ -304,7 +304,7 @@ class TopModel extends AbstractTableModel {
 				
 				if ( row.m_status==TradingStatus.Stop) {
 					ApiDemo.INSTANCE.controller().reqOptionMktData(row.getContract(), "", false, row);
-					ApiDemo.INSTANCE.getDemoLogger().info("stop market data flow");
+					ApiDemo.INSTANCE.getDemoLogger().info("start market data flow");
 				}
 				
 				row.setStatus(TradingStatus.Init);
