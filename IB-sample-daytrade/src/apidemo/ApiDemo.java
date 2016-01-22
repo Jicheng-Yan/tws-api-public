@@ -293,6 +293,7 @@ public class ApiDemo implements IConnectionHandler {
 				}
 			};
 
+			/*
 			HtmlButton disconnect = new HtmlButton("Disconnect") {
 				@Override
 				public void actionPerformed() {
@@ -300,6 +301,7 @@ public class ApiDemo implements IConnectionHandler {
 					m_controller.disconnect();
 				}
 			};
+			*/
 
 			JPanel p1 = new VerticalPanel();
 			p1.add( "Host", m_host);
@@ -308,7 +310,7 @@ public class ApiDemo implements IConnectionHandler {
 			
 			JPanel p2 = new VerticalPanel();
 			p2.add(connect);
-			p2.add(disconnect);
+			//p2.add(disconnect);
 			p2.add(Box.createVerticalStrut(20));
 
 			JPanel p3 = new VerticalPanel();
