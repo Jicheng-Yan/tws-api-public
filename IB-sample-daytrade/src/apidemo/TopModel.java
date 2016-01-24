@@ -99,9 +99,9 @@ class TopModel extends AbstractTableModel {
 		case 5:
 			return "Change";
 		case 6:
-			return "Volume";
+			return "MaxTail";
 		case 7:
-			return "AvgCost"; // jicheng
+			return "MinTail"; // jicheng
 		case 8:
 			return "Bid";
 		case 9:
@@ -178,9 +178,9 @@ class TopModel extends AbstractTableModel {
 		case 5:
 			return row.change();
 		case 6:
-			return Formats.fmt0(row.m_volume);
+			return fmt(row.m_maxTail);
 		case 7:
-			return fmt(row.m_avgCost); // jicheng
+			return fmt(row.m_minTail); // jicheng
 		case 8:
 			return fmt(row.m_bid);
 		case 9:
@@ -243,7 +243,7 @@ class TopModel extends AbstractTableModel {
 
 	@Override
 	public boolean isCellEditable(int rowSet, int col) {
-		if (col == 12 || col == 15 || col == 16 || col == 17 || col == 18  || col == 19 
+		if (col == 6 || col == 7 || col == 12 || col == 15 || col == 16 || col == 17 || col == 18  || col == 19 
 		 || col == 20 || col == 21 || col == 22 || col == 30 || col == 31 || col == 33 || col == 34) {
 			return true;
 		} else {
@@ -259,13 +259,39 @@ class TopModel extends AbstractTableModel {
 		Integer    tmp_int = 0;
 
 		switch (col) {
+		case 6:
+			tmp_double = new Double(value.toString() ); 
+			if (((int)(tmp_double*100))%25 != 0) {
+				ApiDemo.INSTANCE.getDemoLogger().info("must be multiple by 0.25");
+				break;
+			} else if ( row.m_status==TradingStatus.S_M_M && row.getBidPrice() < tmp_double + row.getOffset() ) {
+				ApiDemo.INSTANCE.getDemoLogger().info("getBidPrice() < tmp_double + row.getOffset()");
+				break;
+			} else {
+				row.m_maxTail = tmp_double;
+				ApiDemo.INSTANCE.getDemoLogger().info("MaxTail: " + row.m_maxTail);
+				break;
+			}
+		case 7:
+			tmp_double = new Double(value.toString() ); 
+			if (((int)(tmp_double*100))%25 != 0) {
+				ApiDemo.INSTANCE.getDemoLogger().info("must be multiple by 0.25");
+				break;
+			} else if ( row.m_status==TradingStatus.B_M_M && row.getAskPrice() > tmp_double - row.getOffset() ) {
+				ApiDemo.INSTANCE.getDemoLogger().info("row.getAskPrice() > tmp_double - row.getOffset()");
+				break;
+			} else {
+				row.m_minTail = tmp_double;
+				ApiDemo.INSTANCE.getDemoLogger().info("MinTail: " + row.m_minTail);
+				break;
+			}
 		case 12:
 			row.m_prePosition = new Integer(value.toString());
 			ApiDemo.INSTANCE.getDemoLogger().info("PrePosition: " + row.m_prePosition);
 			break;
 		case 15:
 			tmp_int = new Integer(value.toString()); 
-			if ( tmp_int >= 0 /*&& row.m_status == TradingStatus.Init*/) {
+			if ( tmp_int >= 0 ) {
 				row.m_boxtradinglimit = tmp_int;
 				ApiDemo.INSTANCE.getDemoLogger().info("BoxTradinglimit: " + tmp_int);
 				fireTableDataChanged();
@@ -273,7 +299,7 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 16:
 			tmp_int = new Integer(value.toString()); 
-			if ( tmp_int >= 0 /*&& row.m_status == TradingStatus.Init*/) {
+			if ( tmp_int >= 0 ) {
 				row.m_stoptradinglimit = tmp_int;
 				ApiDemo.INSTANCE.getDemoLogger().info("StopTradinglimit: " + tmp_int);
 				fireTableDataChanged();
@@ -281,7 +307,7 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 17:
 			tmp_int = new Integer(value.toString()); 
-			if ( (row.getPosition() + tmp_int) <= 1 && (tmp_int >= 0) /*&& row.m_status == TradingStatus.Init*/) {
+			if ( (row.getPosition() + tmp_int) <= 1 && (tmp_int >= 0) ) {
 				row.m_unit = tmp_int;
 				ApiDemo.INSTANCE.getDemoLogger().info("trading unit: " + tmp_int);
 				fireTableDataChanged();
@@ -301,6 +327,8 @@ class TopModel extends AbstractTableModel {
 				row.m_stoptradinglimit = 7;
 				row.m_lmt = 0;
 				row.m_offset = 0;
+				row.m_maxTail = 0;
+				row.m_minTail = 0;
 				
 				if ( row.m_status==TradingStatus.Stop) {
 					ApiDemo.INSTANCE.controller().reqOptionMktData(row.getContract(), "", false, row);
@@ -322,21 +350,30 @@ class TopModel extends AbstractTableModel {
 				row.setStatus(TradingStatus.B_L_O);
 			} else if (value.toString().equals("bl")) {
 				row.setStatus(TradingStatus.B_L);
+			} else if (value.toString().equals("smm")) {
+				row.setStatus(TradingStatus.S_M_M);
+			} else if (value.toString().equals("bmm")) {
+				row.setStatus(TradingStatus.B_M_M);
 			}
 			ApiDemo.INSTANCE.getDemoLogger().info("status: " + value.toString());
 			fireTableDataChanged();
 			break;
 		case 19:
 			tmp_double = new Double(value.toString() ); 
-			if (row.m_status==TradingStatus.Init || row.m_status==TradingStatus.B_M) {
+			if (((int)(tmp_double*100))%25 != 0) {
+				ApiDemo.INSTANCE.getDemoLogger().info("must be multiple by 0.25");
+				break;
+			} else	if (row.m_status==TradingStatus.Init || row.m_status==TradingStatus.B_M) {
 				if ( (tmp_double >= 0.0) && (tmp_double > row.m_bid) && (tmp_double > row.m_min) && (tmp_double < row.m_lmt) ) {
 					row.m_max = tmp_double;
+					row.setMaxtail(row.m_max - row.getOffset());
 					ApiDemo.INSTANCE.getDemoLogger().info("Max: " + tmp_double);
 					fireTableDataChanged();
 				}
 			}  else if (row.m_status==TradingStatus.S_M || row.m_status==TradingStatus.B_L || row.m_status==TradingStatus.B_L_O) {
 				if ( (tmp_double >= 0.0)  && (tmp_double > row.m_min) && (tmp_double < row.m_lmt) ) {
 					row.m_max = tmp_double;
+					row.setMaxtail(row.m_max - row.getOffset());
 					ApiDemo.INSTANCE.getDemoLogger().info("Max: " + tmp_double);
 					fireTableDataChanged();
 				}
@@ -344,15 +381,20 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 20:
 			tmp_double = new Double(value.toString()); 
-			if (row.m_status==TradingStatus.S_M) {
+			if (((int)(tmp_double*100))%25 != 0) {
+				ApiDemo.INSTANCE.getDemoLogger().info("must be multiple by 0.25");
+				break;
+			} else	if (row.m_status==TradingStatus.S_M) {
 				if ( (tmp_double >= 0.0) && (tmp_double < row.m_ask) && (tmp_double < row.m_max) /*&& row.m_status == TradingStatus.Init*/) {
 					row.m_min = tmp_double;
+					row.setMinTail(row.getMin() + row.getOffset());
 					ApiDemo.INSTANCE.getDemoLogger().info("Min: " + tmp_double);
 					fireTableDataChanged();
 				}
 			}  else  {
 				if ( (tmp_double >= 0.0) && (tmp_double < row.m_max) /*&& row.m_status == TradingStatus.Init*/) {
 					row.m_min = tmp_double;
+					row.setMinTail(row.getMin() + row.getOffset());
 					ApiDemo.INSTANCE.getDemoLogger().info("Min: " + tmp_double);
 					fireTableDataChanged();
 				}
@@ -360,7 +402,10 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 21:
 			tmp_double = new Double(value.toString()); 
-			if (row.m_status==TradingStatus.Init || row.m_status==TradingStatus.B_M) {
+			if (((int)(tmp_double*100))%25 != 0) {
+				ApiDemo.INSTANCE.getDemoLogger().info("must be multiple by 0.25");
+				break;
+			} else	if (row.m_status==TradingStatus.Init || row.m_status==TradingStatus.B_M) {
 				if ( (tmp_double >= 0.0)  && (tmp_double > row.m_max) /*&& row.m_status == TradingStatus.Init*/) {
 					row.m_lmt = tmp_double;
 					ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double);
@@ -388,7 +433,10 @@ class TopModel extends AbstractTableModel {
 			break;
 		case 22:
 			tmp_double = new Double(value.toString()); 
-			if (row.m_status==TradingStatus.B_L ) {			
+			if (((int)(tmp_double*100))%25 != 0) {
+				ApiDemo.INSTANCE.getDemoLogger().info("must be multiple by 0.25");
+				break;
+			} else	if (row.m_status==TradingStatus.B_L ) {			
 				if ( tmp_double >= 0.0 && ( tmp_double+row.m_lmt > row.m_5sAvg.close() ) ) {
 				row.m_offset = tmp_double;
 				ApiDemo.INSTANCE.getDemoLogger().info("offset: " + tmp_double);
@@ -490,6 +538,8 @@ class TopModel extends AbstractTableModel {
 		double m_undPrice_s;
 		double m_optPrice_s;
 		double m_lmt;
+		double m_maxTail;
+		double m_minTail;
 		double m_offset;
 		int    m_lastprint;
 		Bar    m_5sAvg;
@@ -518,6 +568,8 @@ class TopModel extends AbstractTableModel {
 			m_stoptradinglimit = 7;
 			m_lmt = 0;
 			m_offset = 0;
+			m_maxTail = 0;
+			m_minTail = 0;
 			m_lastprint = 1;
 			m_5sAvg = new Bar(0, 0, 0, 0, 0, 0, 0, 0);
 			
@@ -545,7 +597,7 @@ class TopModel extends AbstractTableModel {
 		}
 		public void closingPrint () {
 			if ( m_lastprint == 1 ) {
-				ApiDemo.INSTANCE.getDemoLogger().info("EoD Record: "+m_description + "-bid:" + m_bid + "-ask:" + m_ask + "-5s:" + m_5sAvg.close());
+				ApiDemo.INSTANCE.getDemoLogger().info("EoD Record: "+m_description + "-bid:" + m_bid + "-ask:" + m_ask + "-5s:" + m_5sAvg.close() + "-MaxTail: " + m_maxTail + "MinTail: " + m_minTail);
 				ApiDemo.INSTANCE.getDemoLogger().info("-Position:"+m_position + "-PrePosition:" + m_prePosition + "-BoxTradingLimit:" + m_boxtradinglimit + "-StopTradingLimit:" + m_stoptradinglimit);
 				ApiDemo.INSTANCE.getDemoLogger().info("-boxTradingCounter:" + m_boxTradingCounter + "-lmtTradingCounter:"+m_lmtTradingCounter + "-Unit:" + m_unit + "-status:" + m_status.toString());
 				ApiDemo.INSTANCE.getDemoLogger().info("-Max:"+m_max + "-Min:" + m_min + "-Limit:" + m_lmt + "-Offset:" + m_offset);
@@ -605,6 +657,22 @@ class TopModel extends AbstractTableModel {
 
 		public synchronized void setlmtTradingCounter(int number) {
 			m_lmtTradingCounter = number;
+		}
+
+		public double getMaxTail() {
+			return m_maxTail;
+		}
+
+		public void setMaxtail(double num) {
+			m_maxTail = num;
+		}
+
+		public double getMintail() {
+			return m_minTail;
+		}
+
+		public void setMinTail(double num) {
+			m_minTail = num;
 		}
 
 		public double getBidPrice() {

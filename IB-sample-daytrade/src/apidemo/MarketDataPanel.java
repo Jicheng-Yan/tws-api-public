@@ -164,9 +164,25 @@ class OrderTimerActionListener implements ActionListener {
 			}
 
 			if (row.getStatus() == TradingStatus.Init) {
-				if ( row.getMax() <= 0 || row.getBidPrice() <= 0 || row.getPosition() > 0) {
+				if ( row.getMax() <= 0 || row.getBidPrice() <= 0 || row.getPosition() > 0 || row.m_maxTail <= 0) {
 					;
-				} else if ( row.getMax() <= row.getBidPrice()) { //sell
+				} else if (  row.getBidPrice() >= row.getMax() ) { //sell
+					row.setStatus(TradingStatus.S_M_M);
+					ApiDemo.INSTANCE.getDemoLogger().info("status changed: Init -> S_M_M ");
+				}
+			} else 	if (row.getStatus() == TradingStatus.S_M_M) {
+				if (row.getBidPrice() > row.getMax() + (row.getLmt() -row.getMax())/2) {
+					Integer tmp = (int)((row.getLmt() -row.getMax())/2);
+					row.setLmt(row.getLmt() + tmp);
+					row.m_max =  row.m_max + tmp;
+					row.m_min = row.m_min +  tmp;
+					ApiDemo.INSTANCE.getDemoLogger().info("new lmt: " + row.getLmt() + "new max: " + row.m_max + "new min: " + row.getMin());
+				} else	if (row.getBidPrice() > row.m_maxTail + row.getOffset()) {
+					row.setMaxtail(row.getBidPrice() - row.getOffset());
+					ApiDemo.INSTANCE.getDemoLogger().info("new maxtail: " + row.getMaxTail());
+				} else if (row.getBidPrice() <= row.m_maxTail ) {
+					row.setMaxtail(row.getMax()-row.getOffset());
+
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
 						ApiDemo.INSTANCE.getDemoLogger().info("getBoxTradingCounter is larger than limit");
 						continue;
@@ -174,11 +190,11 @@ class OrderTimerActionListener implements ActionListener {
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
 					row.setStatus(TradingStatus.Selling);
 					row.setPrePosition( row.getPosition());
-					ApiDemo.INSTANCE.getDemoLogger().info("status changed: Init -> Selling ");
+					ApiDemo.INSTANCE.getDemoLogger().info("status changed: S_M_M -> Selling ");
 					ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getUnit()));					
 					NewOrder order = new NewOrder();
 					order.orderType( OrderType.LMT);
-					order.lmtPrice( row.getMax());
+					order.lmtPrice( row.getBidPrice());
 					order.tif( TimeInForce.DAY);
 					//order.account("DU172556");
 					
@@ -212,66 +228,18 @@ class OrderTimerActionListener implements ActionListener {
 					});
 
 				}
-			
 			} else if (row.getStatus() == TradingStatus.Selling) {
-				if (Math.abs(row.getPosition()) == Math.abs(row.getPrePosition()) + row.getUnit() && ( Math.abs(row.getLmt() + row.getOffset()- row.get5sAvg().close()) < Math.abs(row.get5sAvg().close() - row.getMax()))) {
-					row.setStatus(TradingStatus.S_M);
-					row.setLmt( row.getLmt() + row.getOffset()*4);
-					ApiDemo.INSTANCE.getDemoLogger().info("status change: Selling->Sold");
-					ApiDemo.INSTANCE.getDemoLogger().info("stop price changed to: " + row.getLmt());
-				} else if ( Math.abs(row.getPosition()) == Math.abs(row.getPrePosition()) + row.getUnit()
-				&& Math.abs(row.getLmt() + row.getOffset() - row.get5sAvg().close()) > Math.abs(row.get5sAvg().close() - row.getMax())) {
+				if ( Math.abs(row.getPosition()) == Math.abs(row.getPrePosition()) + row.getUnit()) {
 					row.setStatus(TradingStatus.S_M);
 					ApiDemo.INSTANCE.getDemoLogger().info("status change: Selling->Sold");
 				}
 			} else if (row.getStatus() == TradingStatus.S_M) {
-				if ( row.getMin() <= 0 ||  row.getAskPrice() <= 0 || row.getPosition() >= 0) {
+				if ( row.getMin() <= 0 ||  row.getAskPrice() <= 0 || row.getPosition() >= 0 || row.getMintail() <= 0) {
 					;
-				} else if ( row.getMin() >= row.getAskPrice()) { //buy
-					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
-						ApiDemo.INSTANCE.getDemoLogger().info("getBoxTradingCounter is larger than limit");
-						continue;
-					}
-					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
-					row.setStatus(TradingStatus.Buying);
-					row.setPrePosition( row.getPosition());
-					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from S_M -> buying ");					
-					ApiDemo.INSTANCE.getDemoLogger().info("buy "+row.getContract().description() + " " + Math.abs(row.getUnit()));
-					NewOrder order = new NewOrder();
-					order.orderType( OrderType.LMT);
-					order.lmtPrice( row.getMin());
-					order.tif( TimeInForce.DAY);
-					//order.account("DU172556");
-
-					order.action(Action.BUY);
-					order.outsideRth(true);
-					order.totalQuantity( (int)Math.abs(row.getUnit()));
-					
-					row.getContract().exchange("GLOBEX");
-
-					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
-						@Override public void orderState(NewOrderState orderState) {
-							ApiDemo.INSTANCE.getDemoLogger().info("order placed");						
-						}
-						@Override public void orderStatus(OrderStatus status, int filled, int remaining, double avgFillPrice, long permId, int parentId, double lastFillPrice, int clientId, String whyHeld) {
-							if ( status == OrderStatus.Cancelled) {
-								ApiDemo.INSTANCE.getDemoLogger().info("Order cancelled");						
-								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
-							} else if ( status == OrderStatus.Submitted) {
-								ApiDemo.INSTANCE.getDemoLogger().info("Order submitted");						
-							} else if ( status == OrderStatus.Filled && remaining == 0) {
-								ApiDemo.INSTANCE.getDemoLogger().info("Order filled @avgPrice: " + avgFillPrice);						
-								ApiDemo.INSTANCE.controller().removeOrderHandler( this);
-							} else  {
-								ApiDemo.INSTANCE.getDemoLogger().info("Order hold: " + whyHeld);	
-							}
-						}
-						@Override public void handle(int errorCode, final String errorMsg) {
-							ApiDemo.INSTANCE.getDemoLogger().info("Order code and message: " + errorCode +  " " + errorMsg);						
-							//ApiDemo.INSTANCE.controller().removeOrderHandler( this);
-						}
-					});
-				} else if ( row.getLmt() < row.get5sAvg().close()) {
+				} else if ( row.getAskPrice() <= row.getMin() ) { //buy
+						row.setStatus(TradingStatus.B_M_M);
+						ApiDemo.INSTANCE.getDemoLogger().info("status change: S_M->B_M_M");
+				} else if ( row.get5sAvg().close() > row.getLmt() ) {
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
 						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit");
 						continue;
@@ -284,8 +252,8 @@ class OrderTimerActionListener implements ActionListener {
 					
 					ApiDemo.INSTANCE.getDemoLogger().info("buy "+ row.getContract().description() + " " + Math.abs(row.getPosition()) + " mid: " + row.get5sAvg().close());
 					NewOrder order = new NewOrder();
-					order.orderType( OrderType.MKT);
-					//order.lmtPrice( 150);
+					order.orderType( OrderType.LMT);
+					order.lmtPrice( row.getLmt() + 0.25);
 					order.tif( TimeInForce.DAY);
 					//order.account("DU172556");
 
@@ -317,44 +285,33 @@ class OrderTimerActionListener implements ActionListener {
 						}
 					});
 				}
-			} else if (row.getStatus() == TradingStatus.Buying) {
-				if (  (row.getPosition() == 0 ) && (row.get5sAvg().close() >= row.getLmt())) {
-					if ( row.getLmt() + row.getOffset() < row.get5sAvg().close()) {
-						row.setStatus(TradingStatus.B_L_O);
-						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_L_O");
-					}   else  {
-						row.setStatus(TradingStatus.B_L);
-						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_L");
-					} 					
-				} else	if ( (Math.abs(row.getPrePosition()) == Math.abs(row.getPosition()) + row.getUnit()) && (row.getMin()  >  row.getAskPrice())) {
-						row.setStatus(TradingStatus.B_M);
-						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_M");
-				}			
-			} else if (row.getStatus() == TradingStatus.B_M) {
-				if ( row.getMax() <= 0 || row.getBidPrice() <= 0 || row.getPosition() > 0) {
-					;
-				} else if ( row.getMax() <= row.getBidPrice()) { //sell
+			} else if (row.getStatus() == TradingStatus.B_M_M) {
+				if ( row.getAskPrice() < row.getMintail() -row.getOffset()) {
+					row.setMinTail(row.getAskPrice() + row.getOffset());
+					ApiDemo.INSTANCE.getDemoLogger().info("new mintail: " + row.getMintail());
+				} 	else if ( row.getAskPrice() >= row.getMintail()) {
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
-						ApiDemo.INSTANCE.getDemoLogger().info("BoxTradingCounter is larger than limit");
+						ApiDemo.INSTANCE.getDemoLogger().info("getBoxTradingCounter is larger than limit");
 						continue;
 					}
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
-					row.setStatus(TradingStatus.Selling);
+					row.setMinTail(row.getMin() + row.getOffset());
+					row.setStatus(TradingStatus.Buying);
 					row.setPrePosition( row.getPosition());
-					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from B_M -> Selling ");
-					ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getUnit()));					
+					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from B_M_M -> buying ");					
+					ApiDemo.INSTANCE.getDemoLogger().info("buy "+row.getContract().description() + " " + Math.abs(row.getUnit()));
 					NewOrder order = new NewOrder();
 					order.orderType( OrderType.LMT);
-					order.lmtPrice( row.getMax());
+					order.lmtPrice( row.getAskPrice());
 					order.tif( TimeInForce.DAY);
 					//order.account("DU172556");
-					
-					order.action(Action.SELL);
+
+					order.action(Action.BUY);
 					order.outsideRth(true);
 					order.totalQuantity( (int)Math.abs(row.getUnit()));
 					
 					row.getContract().exchange("GLOBEX");
-					
+
 					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
 						@Override public void orderState(NewOrderState orderState) {
 							ApiDemo.INSTANCE.getDemoLogger().info("order placed");						
@@ -377,10 +334,32 @@ class OrderTimerActionListener implements ActionListener {
 							//ApiDemo.INSTANCE.controller().removeOrderHandler( this);
 						}
 					});
+
+					
+				}
+			} else if (row.getStatus() == TradingStatus.Buying) {
+				if (  (row.getPosition() == 0 ) && (row.get5sAvg().close() >= row.getLmt())) {
+					if ( row.getLmt() + row.getOffset() < row.get5sAvg().close()) {
+						row.setStatus(TradingStatus.B_L_O);
+						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_L_O");
+					}   else  {
+						row.setStatus(TradingStatus.B_L);
+						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_L");
+					} 					
+				} else	if ( Math.abs(row.getPrePosition()) == Math.abs(row.getPosition()) + row.getUnit()) {
+						row.setStatus(TradingStatus.B_M);
+						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_M");
+				}			
+			} else if (row.getStatus() == TradingStatus.B_M) {
+				if ( row.getMax() <= 0 || row.getBidPrice() <= 0 || row.getPosition() > 0 || row.getMaxTail() <= 0) {
+					;
+				} else if ( row.getBidPrice() >= row.getMax() ) { //sell
+					row.setStatus(TradingStatus.S_M_M);
+					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from B_M -> S_M_M ");
 				}
 			
 			} else if (row.getStatus() == TradingStatus.B_L_O) {
-				if (row.getLmt() + row.getOffset() > row.get5sAvg().close()) { //sell
+				if (row.get5sAvg().close() <= row.getLmt()  ) { //sell
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
 						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit");
 						continue;
@@ -388,11 +367,12 @@ class OrderTimerActionListener implements ActionListener {
 					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
 					row.setStatus(TradingStatus.Selling);
 					ApiDemo.INSTANCE.getDemoLogger().info("status change: B_L_O->Selling");
+					row.setLmt(row.getLmt() + row.getOffset() );
 					
 					ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getPrePosition())   + " mid: " + row.get5sAvg().close());
 					NewOrder order = new NewOrder();
-					order.orderType( OrderType.MKT);
-					//order.lmtPrice( 150);
+					order.orderType( OrderType.LMT);
+					order.lmtPrice( row.getLmt() - 0.25);
 					order.tif( TimeInForce.DAY);
 					//order.account("DU172556");
 				
@@ -426,7 +406,7 @@ class OrderTimerActionListener implements ActionListener {
 					});
 				}				
 			}	else if (row.getStatus() == TradingStatus.B_L) {
-				if ( row.getLmt() + row.getOffset() < row.get5sAvg().close()  ) {
+				if ( row.get5sAvg().close() > row.getLmt() + row.getOffset()) {
 					row.setStatus(TradingStatus.B_L_O);
 					ApiDemo.INSTANCE.getDemoLogger().info("status change: B_L->B_L_O");
 				}			
