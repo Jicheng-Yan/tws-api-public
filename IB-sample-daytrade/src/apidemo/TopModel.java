@@ -370,7 +370,7 @@ class TopModel extends AbstractTableModel {
 					ApiDemo.INSTANCE.getDemoLogger().info("Max: " + tmp_double);
 					fireTableDataChanged();
 				}
-			}  else if (row.m_status==TradingStatus.S_M || row.m_status==TradingStatus.B_L || row.m_status==TradingStatus.B_L_O) {
+			}  else if (row.m_status==TradingStatus.S_M || row.m_status==TradingStatus.B_L || row.m_status==TradingStatus.B_L_O || row.m_status==TradingStatus.S_M_M) {
 				if ( (tmp_double >= 0.0)  && (tmp_double > row.m_min) && (tmp_double < row.m_lmt) ) {
 					row.m_max = tmp_double;
 					row.setMaxtail(row.m_max - row.getOffset());
@@ -405,7 +405,7 @@ class TopModel extends AbstractTableModel {
 			if (((int)(tmp_double*100))%25 != 0) {
 				ApiDemo.INSTANCE.getDemoLogger().info("must be multiple by 0.25");
 				break;
-			} else	if (row.m_status==TradingStatus.Init || row.m_status==TradingStatus.B_M) {
+			} else	if (row.m_status==TradingStatus.Init || row.m_status==TradingStatus.B_M || row.m_status==TradingStatus.S_M_M) {
 				if ( (tmp_double >= 0.0)  && (tmp_double > row.m_max) /*&& row.m_status == TradingStatus.Init*/) {
 					row.m_lmt = tmp_double;
 					ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double);

@@ -182,6 +182,7 @@ class OrderTimerActionListener implements ActionListener {
 					ApiDemo.INSTANCE.getDemoLogger().info("new maxtail: " + row.getMaxTail());
 				} else if (row.getBidPrice() <= row.m_maxTail ) {
 					row.setMaxtail(row.getMax()-row.getOffset());
+					ApiDemo.INSTANCE.getDemoLogger().info("reset maxtail to: "+ row.getMaxTail());
 
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
 						ApiDemo.INSTANCE.getDemoLogger().info("getBoxTradingCounter is larger than limit");
@@ -253,7 +254,7 @@ class OrderTimerActionListener implements ActionListener {
 					ApiDemo.INSTANCE.getDemoLogger().info("buy "+ row.getContract().description() + " " + Math.abs(row.getPosition()) + " mid: " + row.get5sAvg().close());
 					NewOrder order = new NewOrder();
 					order.orderType( OrderType.LMT);
-					order.lmtPrice( row.getLmt() + 0.25);
+					order.lmtPrice( row.getAskPrice());
 					order.tif( TimeInForce.DAY);
 					//order.account("DU172556");
 
@@ -296,6 +297,7 @@ class OrderTimerActionListener implements ActionListener {
 					}
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
 					row.setMinTail(row.getMin() + row.getOffset());
+					ApiDemo.INSTANCE.getDemoLogger().info("reset MinTail to:" + row.getMintail());
 					row.setStatus(TradingStatus.Buying);
 					row.setPrePosition( row.getPosition());
 					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from B_M_M -> buying ");					
@@ -368,11 +370,11 @@ class OrderTimerActionListener implements ActionListener {
 					row.setStatus(TradingStatus.Selling);
 					ApiDemo.INSTANCE.getDemoLogger().info("status change: B_L_O->Selling");
 					row.setLmt(row.getLmt() + row.getOffset() );
-					
+					ApiDemo.INSTANCE.getDemoLogger().info("reset lmt to:" + row.getLmt());
 					ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getPrePosition())   + " mid: " + row.get5sAvg().close());
 					NewOrder order = new NewOrder();
 					order.orderType( OrderType.LMT);
-					order.lmtPrice( row.getLmt() - 0.25);
+					order.lmtPrice( row.getBidPrice());
 					order.tif( TimeInForce.DAY);
 					//order.account("DU172556");
 				
