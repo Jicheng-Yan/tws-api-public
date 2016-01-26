@@ -264,8 +264,8 @@ class TopModel extends AbstractTableModel {
 			if (((int)(tmp_double*100))%25 != 0) {
 				ApiDemo.INSTANCE.getDemoLogger().info("must be multiple by 0.25");
 				break;
-			} else if ( row.m_status==TradingStatus.S_M_M && row.getBidPrice() < tmp_double + row.getOffset() ) {
-				ApiDemo.INSTANCE.getDemoLogger().info("getBidPrice() < tmp_double + row.getOffset()");
+			} else if (row.m_status==TradingStatus.S_M_M && tmp_double > row.getBidPrice() ) {
+				ApiDemo.INSTANCE.getDemoLogger().info("getBidPrice() < maxtail");
 				break;
 			} else {
 				row.m_maxTail = tmp_double;
@@ -277,8 +277,8 @@ class TopModel extends AbstractTableModel {
 			if (((int)(tmp_double*100))%25 != 0) {
 				ApiDemo.INSTANCE.getDemoLogger().info("must be multiple by 0.25");
 				break;
-			} else if ( row.m_status==TradingStatus.B_M_M && row.getAskPrice() > tmp_double - row.getOffset() ) {
-				ApiDemo.INSTANCE.getDemoLogger().info("row.getAskPrice() > tmp_double - row.getOffset()");
+			} else if ( row.m_status==TradingStatus.B_M_M &&  tmp_double < row.getAskPrice()   ) {
+				ApiDemo.INSTANCE.getDemoLogger().info("row.getAskPrice() > minTail");
 				break;
 			} else {
 				row.m_minTail = tmp_double;
