@@ -200,7 +200,7 @@ class OrderTimerActionListener implements ActionListener {
 					//order.account("DU172556");
 					
 					order.action(Action.SELL);
-					order.outsideRth(true);
+					//order.outsideRth(true);
 					order.totalQuantity( (int)Math.abs(row.getUnit()));
 					
 					row.getContract().exchange("GLOBEX");
@@ -259,7 +259,7 @@ class OrderTimerActionListener implements ActionListener {
 					//order.account("DU172556");
 
 					order.action(Action.BUY);
-					order.outsideRth(true);
+					//order.outsideRth(true);
 					order.totalQuantity( Math.abs(row.getPosition()));
 					row.getContract().exchange("GLOBEX");
 
@@ -309,7 +309,7 @@ class OrderTimerActionListener implements ActionListener {
 					//order.account("DU172556");
 
 					order.action(Action.BUY);
-					order.outsideRth(true);
+					//order.outsideRth(true);
 					order.totalQuantity( (int)Math.abs(row.getUnit()));
 					
 					row.getContract().exchange("GLOBEX");
@@ -374,7 +374,7 @@ class OrderTimerActionListener implements ActionListener {
 					//order.account("DU172556");
 				
 					order.action(Action.SELL);
-					order.outsideRth(true);
+					//order.outsideRth(true);
 					order.totalQuantity( (int)Math.abs(row.getPrePosition()));
 					row.setPrePosition(row.getPrePosition() + row.getUnit());
 					row.getContract().exchange("GLOBEX");
