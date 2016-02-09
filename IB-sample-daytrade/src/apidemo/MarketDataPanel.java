@@ -240,7 +240,7 @@ class OrderTimerActionListener implements ActionListener {
 				} else if ( row.getAskPrice() <= row.getMin() ) { //buy
 						row.setStatus(TradingStatus.B_M_M);
 						ApiDemo.INSTANCE.getDemoLogger().info("status change: S_M->B_M_M");
-				} else if ( row.get5sAvg().close() > row.getLmt() ) {
+				} else if ( row.get5sAvg().close() >= row.getLmt() ) {
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
 						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit");
 						continue;
@@ -360,8 +360,8 @@ class OrderTimerActionListener implements ActionListener {
 					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from B_M -> S_M_M ");
 				}
 			
-			} else if (row.getStatus() == TradingStatus.B_L_O) {
-				if (row.get5sAvg().close() <= row.getLmt()  ) { //sell
+			} else if (row.getStatus() == TradingStatus.B_L_O ) {
+				if (row.get5sAvg().close() <= row.getLmt() -row.getOffset() ) { //sell
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
 						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit");
 						continue;
@@ -369,7 +369,7 @@ class OrderTimerActionListener implements ActionListener {
 					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
 					row.setStatus(TradingStatus.Selling);
 					ApiDemo.INSTANCE.getDemoLogger().info("status change: B_L_O->Selling");
-					row.setLmt(row.getLmt() + row.getOffset() );
+					//row.setLmt(row.getLmt() + row.getOffset() );
 					ApiDemo.INSTANCE.getDemoLogger().info("reset lmt to:" + row.getLmt());
 					ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getPrePosition())   + " mid: " + row.get5sAvg().close());
 					NewOrder order = new NewOrder();
@@ -408,7 +408,7 @@ class OrderTimerActionListener implements ActionListener {
 					});
 				}				
 			}	else if (row.getStatus() == TradingStatus.B_L) {
-				if ( row.get5sAvg().close() > row.getLmt() + row.getOffset()) {
+				if ( row.get5sAvg().close() >= row.getLmt() + row.getOffset()) {
 					row.setStatus(TradingStatus.B_L_O);
 					ApiDemo.INSTANCE.getDemoLogger().info("status change: B_L->B_L_O");
 				}			
