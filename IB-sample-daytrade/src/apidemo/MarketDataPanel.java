@@ -341,13 +341,8 @@ class OrderTimerActionListener implements ActionListener {
 				}
 			} else if (row.getStatus() == TradingStatus.Buying) {
 				if (  (row.getPosition() == 0 ) && (row.get5sAvg().close() >= row.getLmt())) {
-					if ( row.getLmt() + row.getOffset() < row.get5sAvg().close()) {
 						row.setStatus(TradingStatus.B_L_O);
 						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_L_O");
-					}   else  {
-						row.setStatus(TradingStatus.B_L);
-						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_L");
-					} 					
 				} else	if ( Math.abs(row.getPrePosition()) == Math.abs(row.getPosition()) + row.getUnit()) {
 						row.setStatus(TradingStatus.B_M);
 						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_M");
