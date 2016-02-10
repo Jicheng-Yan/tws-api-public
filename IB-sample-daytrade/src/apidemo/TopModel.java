@@ -581,7 +581,7 @@ class TopModel extends AbstractTableModel {
 				
 			m_cal_end.set(Calendar.HOUR_OF_DAY, 15);
 			m_cal_end.set(Calendar.MINUTE, 14);
-			m_cal_end.set(Calendar.SECOND , 05);
+			m_cal_end.set(Calendar.SECOND , 55);
 		}
 
 		@Override public void realtimeBar(Bar bar) {
