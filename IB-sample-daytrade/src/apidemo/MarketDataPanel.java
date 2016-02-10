@@ -163,6 +163,16 @@ class OrderTimerActionListener implements ActionListener {
 				continue;
 			}
 
+			if ( row.get5sAvg().close() < row.getBidPrice() ) {
+				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is below bid- 5savg: " +  row.get5sAvg().close() + "bid: " + row.getBidPrice());
+				continue;
+			}
+			
+			if ( row.get5sAvg().close() > row.getAskPrice() ) {
+				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is over ask- 5savg: " +  row.get5sAvg().close() + "ask: " + row.getAskPrice());
+				continue;
+			}
+
 			if ( (Math.abs(row.get5sAvg().close() -  (row.getBidPrice() + row.getAskPrice())/2) > 5)) {
 				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is too far from midprice");
 				continue;
