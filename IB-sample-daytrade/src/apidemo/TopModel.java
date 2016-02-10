@@ -269,7 +269,7 @@ class TopModel extends AbstractTableModel {
 				break;
 			} else {
 				row.m_maxTail = tmp_double;
-				ApiDemo.INSTANCE.getDemoLogger().info("MaxTail: " + row.m_maxTail);
+				ApiDemo.INSTANCE.getDemoLogger().info("MaxTail: " + row.m_maxTail + " " + row.getContract().description());
 				break;
 			}
 		case 7:
@@ -282,18 +282,18 @@ class TopModel extends AbstractTableModel {
 				break;
 			} else {
 				row.m_minTail = tmp_double;
-				ApiDemo.INSTANCE.getDemoLogger().info("MinTail: " + row.m_minTail);
+				ApiDemo.INSTANCE.getDemoLogger().info("MinTail: " + row.m_minTail + " " + row.getContract().description());
 				break;
 			}
 		case 12:
 			row.m_prePosition = new Integer(value.toString());
-			ApiDemo.INSTANCE.getDemoLogger().info("PrePosition: " + row.m_prePosition);
+			ApiDemo.INSTANCE.getDemoLogger().info("PrePosition: " + row.m_prePosition + " " + row.getContract().description());
 			break;
 		case 15:
 			tmp_int = new Integer(value.toString()); 
 			if ( tmp_int >= 0 ) {
 				row.m_boxtradinglimit = tmp_int;
-				ApiDemo.INSTANCE.getDemoLogger().info("BoxTradinglimit: " + tmp_int);
+				ApiDemo.INSTANCE.getDemoLogger().info("BoxTradinglimit: " + tmp_int + " " + row.getContract().description());
 				fireTableDataChanged();
 			}	
 			break;
@@ -301,7 +301,7 @@ class TopModel extends AbstractTableModel {
 			tmp_int = new Integer(value.toString()); 
 			if ( tmp_int >= 0 ) {
 				row.m_stoptradinglimit = tmp_int;
-				ApiDemo.INSTANCE.getDemoLogger().info("StopTradinglimit: " + tmp_int);
+				ApiDemo.INSTANCE.getDemoLogger().info("StopTradinglimit: " + tmp_int + " " + row.getContract().description());
 				fireTableDataChanged();
 			}	
 			break;
@@ -312,7 +312,7 @@ class TopModel extends AbstractTableModel {
 				ApiDemo.INSTANCE.getDemoLogger().info("trading unit: " + tmp_int);
 				fireTableDataChanged();
 			} else {
-				ApiDemo.INSTANCE.getDemoLogger().info("trading unit larger than short position ");
+				ApiDemo.INSTANCE.getDemoLogger().info("trading unit larger than short position " + " " + row.getContract().description());
 			}
 			break;
 		case 18:
@@ -332,14 +332,14 @@ class TopModel extends AbstractTableModel {
 				
 				if ( row.m_status==TradingStatus.Stop) {
 					ApiDemo.INSTANCE.controller().reqOptionMktData(row.getContract(), "", false, row);
-					ApiDemo.INSTANCE.getDemoLogger().info("start market data flow");
+					ApiDemo.INSTANCE.getDemoLogger().info("start market data flow" + " " + row.getContract().description());
 				}
 				
 				row.setStatus(TradingStatus.Init);
 			} else if (value.toString().equals("stop")) {
 				row.setStatus(TradingStatus.Stop);
 				ApiDemo.INSTANCE.controller().cancelOptionMktData(row);
-				ApiDemo.INSTANCE.getDemoLogger().info("stop market data flow");
+				ApiDemo.INSTANCE.getDemoLogger().info("stop market data flow" + " " + row.getContract().description());
 			} else if (value.toString().equals("sm")) {
 				row.setStatus(TradingStatus.S_M);
 			} /*else if (value.toString().equals("Buying")) {
@@ -355,7 +355,7 @@ class TopModel extends AbstractTableModel {
 			} else if (value.toString().equals("bmm")) {
 				row.setStatus(TradingStatus.B_M_M);
 			}
-			ApiDemo.INSTANCE.getDemoLogger().info("status: " + value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("status: " + value.toString() + " " + row.getContract().description());
 			fireTableDataChanged();
 			break;
 		case 19:
@@ -367,14 +367,14 @@ class TopModel extends AbstractTableModel {
 				if ( (tmp_double >= 0.0) && (tmp_double > row.m_bid) && (tmp_double > row.m_min) && (tmp_double < row.m_lmt) ) {
 					row.m_max = tmp_double;
 					row.setMaxtail(row.m_max - row.getOffset());
-					ApiDemo.INSTANCE.getDemoLogger().info("Max: " + tmp_double);
+					ApiDemo.INSTANCE.getDemoLogger().info("Max: " + tmp_double + " " + row.getContract().description());
 					fireTableDataChanged();
 				}
 			}  else if (row.m_status==TradingStatus.S_M || row.m_status==TradingStatus.B_L || row.m_status==TradingStatus.B_L_O || row.m_status==TradingStatus.S_M_M) {
 				if ( (tmp_double >= 0.0)  && (tmp_double > row.m_min) && (tmp_double < row.m_lmt) ) {
 					row.m_max = tmp_double;
 					row.setMaxtail(row.m_max - row.getOffset());
-					ApiDemo.INSTANCE.getDemoLogger().info("Max: " + tmp_double);
+					ApiDemo.INSTANCE.getDemoLogger().info("Max: " + tmp_double + " " + row.getContract().description());
 					fireTableDataChanged();
 				}
 			}	
@@ -388,14 +388,14 @@ class TopModel extends AbstractTableModel {
 				if ( (tmp_double >= 0.0) && (tmp_double < row.m_ask) && (tmp_double < row.m_max) /*&& row.m_status == TradingStatus.Init*/) {
 					row.m_min = tmp_double;
 					row.setMinTail(row.getMin() + row.getOffset());
-					ApiDemo.INSTANCE.getDemoLogger().info("Min: " + tmp_double);
+					ApiDemo.INSTANCE.getDemoLogger().info("Min: " + tmp_double + " " + row.getContract().description());
 					fireTableDataChanged();
 				}
 			}  else  {
 				if ( (tmp_double >= 0.0) && (tmp_double < row.m_max) /*&& row.m_status == TradingStatus.Init*/) {
 					row.m_min = tmp_double;
 					row.setMinTail(row.getMin() + row.getOffset());
-					ApiDemo.INSTANCE.getDemoLogger().info("Min: " + tmp_double);
+					ApiDemo.INSTANCE.getDemoLogger().info("Min: " + tmp_double + " " + row.getContract().description());
 					fireTableDataChanged();
 				}
 			}	
@@ -408,25 +408,25 @@ class TopModel extends AbstractTableModel {
 			} else	if (row.m_status==TradingStatus.Init || row.m_status==TradingStatus.B_M || row.m_status==TradingStatus.S_M_M) {
 				if ( (tmp_double >= 0.0)  && (tmp_double > row.m_max) /*&& row.m_status == TradingStatus.Init*/) {
 					row.m_lmt = tmp_double;
-					ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double);
+					ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double + " " + row.getContract().description());
 					fireTableDataChanged();
 				}
 			}  else if (row.m_status==TradingStatus.S_M  ) {
 				if ( (tmp_double >= 0.0) && ( tmp_double > row.m_5sAvg.close() ) && (tmp_double > row.m_max) /*&& row.m_status == TradingStatus.Init*/) {
 					row.m_lmt = tmp_double;
-					ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double);
+					ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double + " " + row.getContract().description());
 					fireTableDataChanged();
 				}
 			}  else if (row.m_status==TradingStatus.B_L ) {
 				if ( (tmp_double >= 0.0) && ( tmp_double+row.m_offset > row.m_5sAvg.close() ) && (tmp_double > row.m_max) /*&& row.m_status == TradingStatus.Init*/) {
 					row.m_lmt = tmp_double;
-					ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double);
+					ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double + " " + row.getContract().description());
 					fireTableDataChanged();
 				}
 			} else if (row.m_status==TradingStatus.B_L_O) {
 				if ( (tmp_double >= 0.0) && ( tmp_double < row.m_5sAvg.close() ) && (tmp_double > row.m_max) /*&& row.m_status == TradingStatus.Init*/) {
 					row.m_lmt = tmp_double;
-					ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double);
+					ApiDemo.INSTANCE.getDemoLogger().info("m_lmt: " + tmp_double + " " + row.getContract().description());
 					fireTableDataChanged();
 				}
 			}	
@@ -439,13 +439,13 @@ class TopModel extends AbstractTableModel {
 			} else	if (row.m_status==TradingStatus.B_L ) {			
 				if ( tmp_double >= 0.0 && ( tmp_double+row.m_lmt > row.m_5sAvg.close() ) ) {
 				row.m_offset = tmp_double;
-				ApiDemo.INSTANCE.getDemoLogger().info("offset: " + tmp_double);
+				ApiDemo.INSTANCE.getDemoLogger().info("offset: " + tmp_double + " " + row.getContract().description());
 				fireTableDataChanged();
 				}
 			} else {
 				if ( tmp_double >= 0.0  ) {
 				row.m_offset = tmp_double;
-				ApiDemo.INSTANCE.getDemoLogger().info("offset: " + tmp_double);
+				ApiDemo.INSTANCE.getDemoLogger().info("offset: " + tmp_double + " " + row.getContract().description());
 				fireTableDataChanged();
 				}
 			}
@@ -455,7 +455,7 @@ class TopModel extends AbstractTableModel {
 			if ( row.m_impVol_s > 0 ) {
 				ApiDemo.INSTANCE.controller().cancelOptionComp(row);
 				ApiDemo.INSTANCE.controller().reqOptionComputation(row.getContract(), row.m_impVol_s, row.m_undPrice_s, row);
-				ApiDemo.INSTANCE.getDemoLogger().info("Set impVol: " + value.toString());
+				ApiDemo.INSTANCE.getDemoLogger().info("Set impVol: " + value.toString() + " " + row.getContract().description());
 			}
 			fireTableDataChanged();
 			break;
@@ -464,7 +464,7 @@ class TopModel extends AbstractTableModel {
 			if ( row.m_undPrice_s > 0) { 
 				ApiDemo.INSTANCE.controller().cancelOptionComp(row);
 				ApiDemo.INSTANCE.controller().reqOptionComputation(row.getContract(), row.m_impVol_s, row.m_undPrice_s, row);
-				ApiDemo.INSTANCE.getDemoLogger().info("Set undPrice: " + value.toString());
+				ApiDemo.INSTANCE.getDemoLogger().info("Set undPrice: " + value.toString() + " " + row.getContract().description());
 			}
 			fireTableDataChanged();
 			break;
@@ -475,7 +475,7 @@ class TopModel extends AbstractTableModel {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			ApiDemo.INSTANCE.getDemoLogger().info("start: " + value.toString());
+			ApiDemo.INSTANCE.getDemoLogger().info("start: " + value.toString() + " " + row.getContract().description());
 			break;
 		case 34:
 			try {
@@ -485,7 +485,7 @@ class TopModel extends AbstractTableModel {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			ApiDemo.INSTANCE.getDemoLogger().info("end: " + value.toString());	
+			ApiDemo.INSTANCE.getDemoLogger().info("end: " + value.toString() + " " + row.getContract().description());	
 			break;
 		}
 		
@@ -603,7 +603,6 @@ class TopModel extends AbstractTableModel {
 				ApiDemo.INSTANCE.getDemoLogger().info("-Position:"+m_position + "-PrePosition:" + m_prePosition + "-BoxTradingLimit:" + m_boxtradinglimit + "-StopTradingLimit:" + m_stoptradinglimit);
 				ApiDemo.INSTANCE.getDemoLogger().info("-boxTradingCounter:" + m_boxTradingCounter + "-lmtTradingCounter:"+m_lmtTradingCounter + "-Unit:" + m_unit + "-status:" + m_status.toString());
 				ApiDemo.INSTANCE.getDemoLogger().info("-Max:"+m_max + "-Min:" + m_min + "-Limit:" + m_lmt + "-Offset:" + m_offset);
-				setStatus(TradingStatus.Stop);
 			} 
 		}
 		public  synchronized Calendar getStart() {

@@ -138,12 +138,14 @@ class OrderTimerActionListener implements ActionListener {
 
 			if ( Calendar.getInstance().before(row.getStart())) {
 				ApiDemo.INSTANCE.getDemoLogger().info("trading session not started, before: "+ dateFormat.format(row.getStart().getTime()));
+				row.setStatus(TradingStatus.Stop);
 				continue;
 			}
 
 			if ( Calendar.getInstance().after(row.getEnd())) {
 				row.closingPrint();
 				row.clearLastprint();
+				row.setStatus(TradingStatus.Stop);
 				ApiDemo.INSTANCE.getDemoLogger().info("trading session has finished, after: "+ dateFormat.format(row.getEnd().getTime()));
 				continue;
 			}
@@ -154,27 +156,27 @@ class OrderTimerActionListener implements ActionListener {
 			}
 			
 			if ( (row.getAskPrice() - row.getBidPrice())/row.getAskPrice() >= 0.2) {
-				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask:" + row.getContract().description() + " bid: " + row.getBidPrice() + " ask: " + row.getAskPrice());
+				ApiDemo.INSTANCE.getDemoLogger().info("too big difference bid/ask: " + row.getContract().description() + " bid: " + row.getBidPrice() + " ask: " + row.getAskPrice());
 				continue;
 			}
 
 			if ( row.get5sAvg().close() <= 0 ) {
-				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is below zero" +  row.get5sAvg().close());
+				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is below zero: " + row.getContract().description() + " : " +  row.get5sAvg().close());
 				continue;
 			}
 
 			if ( row.get5sAvg().close() < row.getBidPrice() ) {
-				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is below bid- 5savg: " +  row.get5sAvg().close() + "bid: " + row.getBidPrice());
+				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is below bid: " + row.getContract().description() + " 5savg: " +  row.get5sAvg().close() + " bid: " + row.getBidPrice());
 				continue;
 			}
 			
 			if ( row.get5sAvg().close() > row.getAskPrice() ) {
-				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is over ask- 5savg: " +  row.get5sAvg().close() + "ask: " + row.getAskPrice());
+				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is over ask: " + row.getContract().description() + "  5savg: " +  row.get5sAvg().close() + " ask: " + row.getAskPrice());
 				continue;
 			}
 
 			if ( (Math.abs(row.get5sAvg().close() -  (row.getBidPrice() + row.getAskPrice())/2) > 5)) {
-				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is too far from midprice");
+				ApiDemo.INSTANCE.getDemoLogger().info("5sec average is too far from midprice " + row.getContract().description() );
 				continue;
 			}
 
@@ -183,7 +185,7 @@ class OrderTimerActionListener implements ActionListener {
 					;
 				} else if (  row.getBidPrice() >= row.getMax() ) { //sell
 					row.setStatus(TradingStatus.S_M_M);
-					ApiDemo.INSTANCE.getDemoLogger().info("status changed: Init -> S_M_M ");
+					ApiDemo.INSTANCE.getDemoLogger().info("status changed: Init -> S_M_M: " + row.getContract().description() );
 				}
 			} else 	if (row.getStatus() == TradingStatus.S_M_M) {
 				if (row.getBidPrice() > row.getMax() + (row.getLmt() -row.getMax())/2) {
@@ -191,22 +193,22 @@ class OrderTimerActionListener implements ActionListener {
 					row.setLmt(row.getLmt() + tmp);
 					row.m_max =  row.m_max + tmp;
 					row.m_min = row.m_min +  tmp;
-					ApiDemo.INSTANCE.getDemoLogger().info("new lmt: " + row.getLmt() + "new max: " + row.m_max + "new min: " + row.getMin());
+					ApiDemo.INSTANCE.getDemoLogger().info("new lmt: " + row.getLmt() + "new max: " + row.m_max + "new min: " + row.getMin() + " " + row.getContract().description() );
 				} else	if (row.getBidPrice() > row.m_maxTail + row.getOffset()) {
 					row.setMaxtail(row.getBidPrice() - row.getOffset());
-					ApiDemo.INSTANCE.getDemoLogger().info("new maxtail: " + row.getMaxTail());
+					ApiDemo.INSTANCE.getDemoLogger().info("new maxtail: " + row.getMaxTail() + " " + row.getContract().description() );
 				} else if (row.getBidPrice() <= row.m_maxTail ) {
 					row.setMaxtail(row.getMax()-row.getOffset());
-					ApiDemo.INSTANCE.getDemoLogger().info("reset maxtail to: "+ row.getMaxTail());
+					ApiDemo.INSTANCE.getDemoLogger().info("reset maxtail to: "+ row.getMaxTail() + " " + row.getContract().description() );
 
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
-						ApiDemo.INSTANCE.getDemoLogger().info("getBoxTradingCounter is larger than limit");
+						ApiDemo.INSTANCE.getDemoLogger().info("getBoxTradingCounter is larger than limit " + row.getContract().description() );
 						continue;
 					}
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
 					row.setStatus(TradingStatus.Selling);
 					row.setPrePosition( row.getPosition());
-					ApiDemo.INSTANCE.getDemoLogger().info("status changed: S_M_M -> Selling ");
+					ApiDemo.INSTANCE.getDemoLogger().info("status changed: S_M_M -> Selling " + row.getContract().description() );
 					ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getUnit()));					
 					NewOrder order = new NewOrder();
 					order.orderType( OrderType.LMT);
@@ -247,22 +249,22 @@ class OrderTimerActionListener implements ActionListener {
 			} else if (row.getStatus() == TradingStatus.Selling) {
 				if ( Math.abs(row.getPosition()) == Math.abs(row.getPrePosition()) + row.getUnit()) {
 					row.setStatus(TradingStatus.S_M);
-					ApiDemo.INSTANCE.getDemoLogger().info("status change: Selling->Sold");
+					ApiDemo.INSTANCE.getDemoLogger().info("status change: Selling->Sold " + row.getContract().description() );
 				}
 			} else if (row.getStatus() == TradingStatus.S_M) {
 				if ( row.getMin() <= 0 ||  row.getAskPrice() <= 0 || row.getPosition() >= 0 || row.getMintail() <= 0) {
 					;
 				} else if ( row.getAskPrice() <= row.getMin() ) { //buy
 						row.setStatus(TradingStatus.B_M_M);
-						ApiDemo.INSTANCE.getDemoLogger().info("status change: S_M->B_M_M");
+						ApiDemo.INSTANCE.getDemoLogger().info("status change: S_M->B_M_M " + row.getContract().description() );
 				} else if ( row.get5sAvg().close() >= row.getLmt() ) {
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
-						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit");
+						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit " + row.getContract().description() );
 						continue;
 					}
 					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
 					row.setStatus(TradingStatus.Buying);
-					ApiDemo.INSTANCE.getDemoLogger().info("status change: S_M->Buying");
+					ApiDemo.INSTANCE.getDemoLogger().info("status change: S_M->Buying " + row.getContract().description() );
 
 					row.setPrePosition( row.getPosition());
 					
@@ -304,10 +306,10 @@ class OrderTimerActionListener implements ActionListener {
 			} else if (row.getStatus() == TradingStatus.B_M_M) {
 				if ( row.getAskPrice() < row.getMintail() -row.getOffset()) {
 					row.setMinTail(row.getAskPrice() + row.getOffset());
-					ApiDemo.INSTANCE.getDemoLogger().info("new mintail: " + row.getMintail());
+					ApiDemo.INSTANCE.getDemoLogger().info("new mintail: " + row.getMintail() + " " + row.getContract().description() );
 				} 	else if ( row.getAskPrice() >= row.getMintail()) {
 					if ( row.getBoxTradingCounter() >= row.getBoxTradinglimit()) {
-						ApiDemo.INSTANCE.getDemoLogger().info("getBoxTradingCounter is larger than limit");
+						ApiDemo.INSTANCE.getDemoLogger().info("getBoxTradingCounter is larger than limit " + row.getContract().description() );
 						continue;
 					}
 					row.setBoxTradingCounter( (row.getBoxTradingCounter()+1));
@@ -315,7 +317,7 @@ class OrderTimerActionListener implements ActionListener {
 					ApiDemo.INSTANCE.getDemoLogger().info("reset MinTail to:" + row.getMintail());
 					row.setStatus(TradingStatus.Buying);
 					row.setPrePosition( row.getPosition());
-					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from B_M_M -> buying ");					
+					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from B_M_M -> buying " + row.getContract().description() );					
 					ApiDemo.INSTANCE.getDemoLogger().info("buy "+row.getContract().description() + " " + Math.abs(row.getUnit()));
 					NewOrder order = new NewOrder();
 					order.orderType( OrderType.LMT);
@@ -357,28 +359,28 @@ class OrderTimerActionListener implements ActionListener {
 			} else if (row.getStatus() == TradingStatus.Buying) {
 				if (  (row.getPosition() == 0 ) && (row.get5sAvg().close() >= row.getLmt())) {
 						row.setStatus(TradingStatus.B_L_O);
-						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_L_O");
+						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_L_O " + row.getContract().description() );
 				} else	if ( Math.abs(row.getPrePosition()) == Math.abs(row.getPosition()) + row.getUnit()) {
 						row.setStatus(TradingStatus.B_M);
-						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_M");
+						ApiDemo.INSTANCE.getDemoLogger().info("status change: Buying->B_M " + row.getContract().description());
 				}			
 			} else if (row.getStatus() == TradingStatus.B_M) {
 				if ( row.getMax() <= 0 || row.getBidPrice() <= 0 || row.getPosition() > 0 || row.getMaxTail() <= 0) {
 					;
 				} else if ( row.getBidPrice() >= row.getMax() ) { //sell
 					row.setStatus(TradingStatus.S_M_M);
-					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from B_M -> S_M_M ");
+					ApiDemo.INSTANCE.getDemoLogger().info("status changed: from B_M -> S_M_M " + row.getContract().description());
 				}
 			
 			} else if (row.getStatus() == TradingStatus.B_L_O ) {
 				if (row.get5sAvg().close() <= row.getLmt() -row.getOffset() ) { //sell
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
-						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit");
+						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit " + row.getContract().description() );
 						continue;
 					}
 					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
 					row.setStatus(TradingStatus.Selling);
-					ApiDemo.INSTANCE.getDemoLogger().info("status change: B_L_O->Selling");
+					ApiDemo.INSTANCE.getDemoLogger().info("status change: B_L_O->Selling " + row.getContract().description() );
 					//row.setLmt(row.getLmt() + row.getOffset() );
 					ApiDemo.INSTANCE.getDemoLogger().info("reset lmt to:" + row.getLmt());
 					ApiDemo.INSTANCE.getDemoLogger().info("sell "+row.getContract().description() + " " + Math.abs(row.getPrePosition())   + " mid: " + row.get5sAvg().close());
