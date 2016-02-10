@@ -133,7 +133,7 @@ class OrderTimerActionListener implements ActionListener {
 
 			if (row.m_counter_pricelog++ >  5*20) { // 20sec
 				row.m_counter_pricelog = 0;
-				ApiDemo.INSTANCE.getDemoLogger().info(" " + row.getContract().description() + "Bid: " + row.getBidPrice() + "ask: " + row.getAskPrice() + "5sAvg: " + row.get5sAvg());
+				ApiDemo.INSTANCE.getDemoLogger().info(" " + row.getContract().description() + " Bid: " + row.getBidPrice() + " ask: " + row.getAskPrice() + " 5sAvg: " + row.get5sAvg().close());
 			}
 
 			if ( Calendar.getInstance().before(row.getStart())) {
