@@ -131,15 +131,20 @@ class OrderTimerActionListener implements ActionListener {
 				continue;
 			}
 
+			if (row.m_counter_pricelog++ >  5*20) { // 20sec
+				row.m_counter_pricelog = 0;
+				ApiDemo.INSTANCE.getDemoLogger().info(" " + row.getContract().description() + "Bid: " + row.getBidPrice() + "ask: " + row.getAskPrice() + "5sAvg: " + row.get5sAvg());
+			}
+
 			if ( Calendar.getInstance().before(row.getStart())) {
-				ApiDemo.INSTANCE.getDemoLogger().fine("trading session not started, before: "+ dateFormat.format(row.getStart().getTime()));
+				ApiDemo.INSTANCE.getDemoLogger().info("trading session not started, before: "+ dateFormat.format(row.getStart().getTime()));
 				continue;
 			}
 
 			if ( Calendar.getInstance().after(row.getEnd())) {
 				row.closingPrint();
 				row.clearLastprint();
-				ApiDemo.INSTANCE.getDemoLogger().fine("trading session has finished, after: "+ dateFormat.format(row.getEnd().getTime()));
+				ApiDemo.INSTANCE.getDemoLogger().info("trading session has finished, after: "+ dateFormat.format(row.getEnd().getTime()));
 				continue;
 			}
 			

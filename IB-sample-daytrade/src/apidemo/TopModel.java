@@ -541,6 +541,7 @@ class TopModel extends AbstractTableModel {
 		double m_maxTail;
 		double m_minTail;
 		double m_offset;
+		int	   m_counter_pricelog;
 		int    m_lastprint;
 		Bar    m_5sAvg;
 		Calendar m_cal_start = Calendar.getInstance(); 
@@ -572,6 +573,7 @@ class TopModel extends AbstractTableModel {
 			m_minTail = 0;
 			m_lastprint = 1;
 			m_5sAvg = new Bar(0, 0, 0, 0, 0, 0, 0, 0);
+			m_counter_pricelog = 0;
 			
 			
 			m_cal_start.set(Calendar.DAY_OF_MONTH, m_cal_start.get(Calendar.DAY_OF_MONTH)-1);
@@ -601,6 +603,7 @@ class TopModel extends AbstractTableModel {
 				ApiDemo.INSTANCE.getDemoLogger().info("-Position:"+m_position + "-PrePosition:" + m_prePosition + "-BoxTradingLimit:" + m_boxtradinglimit + "-StopTradingLimit:" + m_stoptradinglimit);
 				ApiDemo.INSTANCE.getDemoLogger().info("-boxTradingCounter:" + m_boxTradingCounter + "-lmtTradingCounter:"+m_lmtTradingCounter + "-Unit:" + m_unit + "-status:" + m_status.toString());
 				ApiDemo.INSTANCE.getDemoLogger().info("-Max:"+m_max + "-Min:" + m_min + "-Limit:" + m_lmt + "-Offset:" + m_offset);
+				setStatus(TradingStatus.Stop);
 			} 
 		}
 		public  synchronized Calendar getStart() {
