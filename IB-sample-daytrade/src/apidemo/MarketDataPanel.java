@@ -262,6 +262,7 @@ class OrderTimerActionListener implements ActionListener {
 				} else if ( row.get5sAvg().close() >= row.getLmt() ) {
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
 						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit " + row.getContract().description() );
+						row.setStatus(TradingStatus.Stop);
 						continue;
 					}
 					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
@@ -378,6 +379,7 @@ class OrderTimerActionListener implements ActionListener {
 				if (row.get5sAvg().close() <= row.getLmt() -row.getOffset() ) { //sell
 					if ( row.getlmtTradingCounter() >= row.getStopTradinglimit()) {
 						ApiDemo.INSTANCE.getDemoLogger().info("lmtTradingCounter is larger than limit " + row.getContract().description() );
+						row.setStatus(TradingStatus.Stop);
 						continue;
 					}
 					row.setlmtTradingCounter( (row.getlmtTradingCounter()+1));
