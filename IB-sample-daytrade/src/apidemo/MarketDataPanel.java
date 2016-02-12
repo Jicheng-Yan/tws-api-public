@@ -222,7 +222,7 @@ class OrderTimerActionListener implements ActionListener {
 					//order.outsideRth(true);
 					order.totalQuantity( (int)Math.abs(row.getUnit()));
 					
-					row.getContract().exchange("GLOBEX");
+					//row.getContract().exchange("GLOBEX");
 					
 					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
 						@Override public void orderState(NewOrderState orderState) {
@@ -280,7 +280,7 @@ class OrderTimerActionListener implements ActionListener {
 					order.action(Action.BUY);
 					//order.outsideRth(true);
 					order.totalQuantity( Math.abs(row.getPosition()));
-					row.getContract().exchange("GLOBEX");
+					//row.getContract().exchange("GLOBEX");
 
 					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
 						@Override public void orderState(NewOrderState orderState) {
@@ -331,7 +331,7 @@ class OrderTimerActionListener implements ActionListener {
 					//order.outsideRth(true);
 					order.totalQuantity( (int)Math.abs(row.getUnit()));
 					
-					row.getContract().exchange("GLOBEX");
+					//row.getContract().exchange("GLOBEX");
 
 					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
 						@Override public void orderState(NewOrderState orderState) {
@@ -396,7 +396,7 @@ class OrderTimerActionListener implements ActionListener {
 					//order.outsideRth(true);
 					order.totalQuantity( (int)Math.abs(row.getPrePosition()));
 					row.setPrePosition(row.getPrePosition() + row.getUnit());
-					row.getContract().exchange("GLOBEX");
+					//row.getContract().exchange("GLOBEX");
 
 					ApiDemo.INSTANCE.controller().placeOrModifyOrder( (NewContract)row.getContract(), order, new IOrderHandler() {
 						@Override public void orderState(NewOrderState orderState) {
