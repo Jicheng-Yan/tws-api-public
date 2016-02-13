@@ -190,8 +190,8 @@ class OrderTimerActionListener implements ActionListener {
 					ApiDemo.INSTANCE.getDemoLogger().info("status changed: Init -> S_M_M: " + row.getContract().description() );
 				}
 			} else 	if (row.getStatus() == TradingStatus.S_M_M) {
-				if (row.getBidPrice() > row.getMax() + (row.getLmt() -row.getMax())/2) {
-					Integer tmp = (int)((row.getLmt() -row.getMax())/2);
+				Double tmp = Math.ceil((row.getLmt() -row.getMax())/2*4.0)/4.0;
+				if (row.getBidPrice() > row.getMax() + tmp) {
 					row.setLmt(row.getLmt() + tmp);
 					row.m_max =  row.m_max + tmp;
 					row.m_min = row.m_min +  tmp;
